@@ -88,7 +88,6 @@ if bpp ~= 4 then
   error("Unsupported bit depth: " .. bpp)
 end
 
-local ccEntrySize = file:read()
 local ccArraySize = readShort()
 if ccArraySize > 0 then
   if t.setPaletteColour == nil then
@@ -143,7 +142,7 @@ for y=0,height-1 do
 local bgs = ""
 local fgs = ""
 local chs = ""
-for x=0,width-1 do 
+for x=0,width-1 do
   if pw*ph == 1 then
     bgs = bgs .. pal[1 + file:read()]
     fgs = fgs .. "0"
@@ -167,8 +166,6 @@ end
 t.setCursorPos(xoff, yoff + y)
 t.blit(chs, fgs, bgs)
 end
-
-local event, key = os.pullEvent( "key" )
 
 if colsChanged then
   for i=0,ccArraySize-1 do

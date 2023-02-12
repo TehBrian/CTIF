@@ -26,8 +26,6 @@ local component = require("component")
 local event = require("event")
 local gpu = component.gpu
 local unicode = require("unicode")
-local keyboard = require("keyboard")
-local text = require("text")
 local os = require("os")
 local pal = {}
 
@@ -248,7 +246,7 @@ local image = loadImage(args[1])
 drawImage(image)
 
 while true do
-    local name,addr,char,key,player = event.pull("key_down")
+    local key = event.pull("key_down")
     if key == 0x10 then
         break
     end
