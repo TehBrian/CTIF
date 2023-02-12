@@ -4,12 +4,10 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IMOperation;
 import org.im4java.core.Stream2BufferedImage;
-import org.im4java.process.OutputConsumer;
 import pl.asie.ctif.colorspace.Colorspace;
 
 import javax.imageio.ImageIO;
@@ -44,7 +42,6 @@ public final class Utils {
 		}
 
 		return switch (imMode) {
-			case 0 -> null;
 			case 1 -> new ConvertCmd();
 			case 2 -> new ConvertCmd(true);
 			default -> null;

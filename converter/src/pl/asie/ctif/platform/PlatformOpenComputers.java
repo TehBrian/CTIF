@@ -6,7 +6,7 @@ public class PlatformOpenComputers extends Platform {
     public enum Screen {
         TIER_1,
         TIER_2,
-        TIER_3;
+        TIER_3
     }
 
     private final Screen screen;
