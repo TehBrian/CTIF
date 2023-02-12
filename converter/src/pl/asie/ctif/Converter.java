@@ -8,13 +8,14 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 public class Converter {
 	public enum DitherMode {
 		NONE,
 		ERROR,
 		ORDERED
-	};
+	}
 
 	private final Color[] palette;
 	private final BufferedImage image;
@@ -27,7 +28,7 @@ public class Converter {
 	private final int ditherMax;
 
 	public Converter(Color[] colors, BufferedImage image, DitherMode ditherMode, float[] ditherMatrix) {
-		int i = 0;
+		int i;
 
 		this.ditherMode = ditherMode;
 		this.ditherMatrix = ditherMatrix;
@@ -176,14 +177,14 @@ public class Converter {
 					int colorCount = 0;
 					boolean[] uColors = new boolean[palette.length];
 
-					for (int i = 0; i < pixels.length; i++) {
+					for (float[] pixel : pixels) {
 						double bestDist = Double.MAX_VALUE;
 						int bestCol = 0;
 
 						for (int cim1 = 0; cim1 < palMapLength; cim1++) {
 							int ci1 = usePalMap ? palMap[cim1] : cim1;
 							float[] col1 = pal[ci1];
-							double dist = Utils.getColorDistanceSq(col1, pixels[i]);
+							double dist = Utils.getColorDistanceSq(col1, pixel);
 							if (dist < bestDist) {
 								bestCol = ci1;
 								bestDist = dist;
@@ -200,8 +201,7 @@ public class Converter {
 						bci1 = colors[0];
 						bci2 = colors[1];
 
-						for (int i = 0; i < bcq.length; i++)
-							bcq[i] = 0;
+						Arrays.fill(bcq, 0);
 
 						for (int i = 0; i < pixels.length; i++) {
 							int pos = (pw * ph - 1 - i);
@@ -339,9 +339,7 @@ public class Converter {
 										bcea[i][2] = errors[i][2];
 									}
 								}
-								for (int i = 0; i < quadrantLen; i++) {
-									bcq[i] = cq[i];
-								}
+								System.arraycopy(cq, 0, bcq, 0, quadrantLen);
 							}
 						}
 					}

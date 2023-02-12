@@ -1,10 +1,5 @@
 package pl.asie.ctif.colorspace;
 
-import java.util.Arrays;
-
-/**
- * Created by asie on 5/9/17.
- */
 public class ColorspaceMatrix extends Colorspace {
     private final Colorspace parent;
     private final float[] matrixFromRGB;

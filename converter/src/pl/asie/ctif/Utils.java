@@ -27,11 +27,8 @@ public final class Utils {
 			imMode = 1;
 
 			try {
-				cmd.setOutputConsumer(new OutputConsumer() {
-					@Override
-					public void consumeOutput(InputStream inputStream) throws IOException {
+				cmd.setOutputConsumer(inputStream -> {
 
-					}
 				});
 				cmd.run(new IMOperation());
 			} catch (Exception e) {
@@ -46,15 +43,12 @@ public final class Utils {
 			}
 		}
 
-		switch (imMode) {
-			case 0:
-			default:
-				return null;
-			case 1:
-				return new ConvertCmd();
-			case 2:
-				return new ConvertCmd(true);
-		}
+		return switch (imMode) {
+			case 0 -> null;
+			case 1 -> new ConvertCmd();
+			case 2 -> new ConvertCmd(true);
+			default -> null;
+		};
 	}
 
 	public static BufferedImage resize(BufferedImage image, int width, int height, boolean forceNoImagemagick) {

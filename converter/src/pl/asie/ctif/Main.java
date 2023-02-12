@@ -79,7 +79,7 @@ public class Main {
 		SPEED,
 		QUALITY_NATIVE,
 		QUALITY
-	};
+	}
 
 	public static Colorspace COLORSPACE = null;
 	public static Platform PLATFORM = null;
@@ -196,8 +196,6 @@ public class Main {
 
     public static boolean DEBUG = false;
 
-	private static Parameters params;
-
 	private static int rCeil(int x, int y) {
 		if (x % y > 0) {
 			return x - (x % y) + y;
@@ -207,8 +205,9 @@ public class Main {
 	}
 
 	public static void main(String[] args) {
-		params = new Parameters();
-		JCommander jCommander = new JCommander(params, args);
+		Parameters params = new Parameters();
+		JCommander jCommander = new JCommander(params);
+		jCommander.parse(args);
 
 		if (params.help) {
 			jCommander.usage();
@@ -224,26 +223,23 @@ public class Main {
 		}
 
 		if (PLATFORM == null) {
-			System.err.println(String.format("Invalid mode: %s", params.mode));
+			System.err.printf("Invalid mode: %s%n", params.mode);
 			System.exit(1);
 		}
 
 		OPTIMIZATION_LEVEL = params.optimizationLevel;
 		DEBUG = params.debug;
 		if (params.ditherType == null) {
-			switch (params.ditherMode) {
-				case ORDERED:
-					params.ditherType = "4x4";
-					break;
-				default:
-					params.ditherType = "floyd-steinberg";
-					break;
+			if (params.ditherMode == Converter.DitherMode.ORDERED) {
+				params.ditherType = "4x4";
+			} else {
+				params.ditherType = "floyd-steinberg";
 			}
 		}
 
 		BufferedImage image = Utils.loadImage(params.files.get(0));
 		if (image == null) {
-			System.err.println(String.format("Could not load image: %s", params.files.get(0)));
+			System.err.printf("Could not load image: %s%n", params.files.get(0));
 			System.exit(1);
 		}
 
@@ -268,13 +264,13 @@ public class Main {
 		System.out.println(params.w + " " + params.h);
 
 		if (params.w * params.h > PLATFORM.getCharsPx()) {
-			System.err.println(String.format("Size too large: %dx%d (maximum size: %d pixels)", params.w, params.h, PLATFORM.getCharsPx()));
+			System.err.printf("Size too large: %dx%d (maximum size: %d pixels)%n", params.w, params.h, PLATFORM.getCharsPx());
 			System.exit(1);
 		} else if (params.w > PLATFORM.getWidthPx()) {
-			System.err.println(String.format("Width too large: %d (maximum width: %d)", params.w, PLATFORM.getWidthPx()));
+			System.err.printf("Width too large: %d (maximum width: %d)%n", params.w, PLATFORM.getWidthPx());
 			System.exit(1);
 		} else if (params.h > PLATFORM.getHeightPx()) {
-			System.err.println(String.format("Height too large: %d (maximum height: %d)", params.h, PLATFORM.getHeightPx()));
+			System.err.printf("Height too large: %d (maximum height: %d)%n", params.h, PLATFORM.getHeightPx());
 			System.exit(1);
 		}
 
@@ -306,7 +302,7 @@ public class Main {
 			if (params.palette != null) {
 				System.err.println("Reading palette...");
 				try {
-					FileInputStream inputStream = new FileInputStream(new File(params.palette));
+					FileInputStream inputStream = new FileInputStream(params.palette);
 					for (int i = 0; i < PLATFORM.getCustomColorCount(); i++) {
 						int red = inputStream.read();
 						int green = inputStream.read();
@@ -331,11 +327,11 @@ public class Main {
 			if (params.paletteExport != null) {
 				System.err.println("Saving palette...");
 				try {
-					FileOutputStream outputStream = new FileOutputStream(new File(params.paletteExport));
-					for (int i = 0; i < palette.length; i++) {
-						outputStream.write(palette[i].getRed());
-						outputStream.write(palette[i].getGreen());
-						outputStream.write(palette[i].getBlue());
+					FileOutputStream outputStream = new FileOutputStream(params.paletteExport);
+					for (final Color color : palette) {
+						outputStream.write(color.getRed());
+						outputStream.write(color.getGreen());
+						outputStream.write(color.getBlue());
 					}
 					outputStream.close();
 				} catch (Exception e) {

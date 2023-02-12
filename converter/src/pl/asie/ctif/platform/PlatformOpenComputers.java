@@ -12,40 +12,29 @@ public class PlatformOpenComputers extends Platform {
 
     @Override
     public int getCustomColorCount() {
-        switch (tier) {
-            case 1:
-            default:
-                return 0;
-            case 2:
-            case 3:
-                return 16;
-        }
+        return switch (tier) {
+            case 1 -> 0;
+            case 2, 3 -> 16;
+            default -> 0;
+        };
     }
 
     @Override
     public int getWidth() {
-        switch (tier) {
-            case 1:
-                return 40;
-            case 2:
-                return 80;
-            case 3:
-                return 160;
-            default:
-                return 0;
-        }
+        return switch (tier) {
+            case 1 -> 40;
+            case 2 -> 80;
+            case 3 -> 160;
+            default -> 0;
+        };
     }
 
     protected int getRealHeight() {
-        switch (tier) {
-            case 1:
-            case 2:
-                return 25;
-            case 3:
-                return 50;
-            default:
-                return 0;
-        }
+        return switch (tier) {
+            case 1, 2 -> 25;
+            case 3 -> 50;
+            default -> 0;
+        };
     }
 
     @Override
@@ -88,14 +77,11 @@ public class PlatformOpenComputers extends Platform {
     }
 
     protected int getColorCount() {
-        switch (tier) {
-            case 1:
-                return 2;
-            case 2:
-            default:
-                return 16;
-            case 3:
-                return 256;
-        }
+        return switch (tier) {
+            case 1 -> 2;
+            case 2 -> 16;
+            case 3 -> 256;
+            default -> 0;
+        };
     }
 }

@@ -8,14 +8,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class PaletteGeneratorKMeans {
-    static class Result {
-        final Color[] colors;
-        final double error;
-
-        public Result(Color[] colors, double error) {
-            this.colors = colors;
-            this.error = error;
-        }
+    record Result(Color[] colors, double error) {
     }
 
     public class Worker implements Runnable {
@@ -31,7 +24,6 @@ public class PaletteGeneratorKMeans {
     private final BufferedImage image;
     private final Color[] base;
     private final Random random = new Random();
-    private final Map<Integer, float[]> pointsAdded = new HashMap<>();
     private final Map<float[], Integer> pointsWeight = new HashMap<>();
     private final float[][] centroids;
     private final Map<float[], Double> knownBestError = new HashMap<>();
@@ -43,6 +35,7 @@ public class PaletteGeneratorKMeans {
         this.base = base;
         this.centroids = new float[base.length][];
 
+        Map<Integer, float[]> pointsAdded = new HashMap<>();
         if (samplingRes > 0) {
             int maximum = samplingRes;
             float stepX = (float) image.getWidth() / maximum;
