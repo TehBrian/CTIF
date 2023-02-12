@@ -73,8 +73,8 @@ public class Converter {
 
 		stream.write(1); // Header version
 		stream.write(0); // Platform variant (0 - default)
-		stream.write(Main.PLATFORM.platformId);
-		stream.write(Main.PLATFORM.platformId >> 8); // Platform ID
+		stream.write(Main.PLATFORM.getPlatformId());
+		stream.write(Main.PLATFORM.getPlatformId() >> 8); // Platform ID
 		stream.write(cw & 0xFF);
 		stream.write(cw >> 8); // Width in chars
 		stream.write(ch & 0xFF);
@@ -125,7 +125,10 @@ public class Converter {
 
 		float[] colA = new float[3];
 
-		boolean usePalMap = Main.OPTIMIZATION_LEVEL > 0 && Main.PLATFORM instanceof PlatformOpenComputers && ((PlatformOpenComputers) Main.PLATFORM).tier == 3;
+		boolean usePalMap = Main.OPTIMIZATION_LEVEL > 0
+				&& Main.PLATFORM instanceof PlatformOpenComputers
+				&& ((PlatformOpenComputers) Main.PLATFORM).getScreen() == PlatformOpenComputers.Screen.TIER_3;
+
 		int[] palMap = new int[palette.length];
 		int palMapLength;
 		for (int i = 0; i < 16; i++)

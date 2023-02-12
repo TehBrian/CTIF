@@ -8,7 +8,7 @@ public class PlatformComputerCraft extends Platform {
     }
 
     @Override
-    Color[] generatePalette() {
+    public Color[] generatePalette() {
         Color[] colors = new Color[16];
         colors[0] = new Color(0xf0f0f0);
         colors[1] = new Color(0xf2b233);

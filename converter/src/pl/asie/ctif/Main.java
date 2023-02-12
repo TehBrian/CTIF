@@ -92,8 +92,8 @@ public class Main {
 		PLATFORMS.put("cc", new PlatformComputerCraft(false));
 		PLATFORMS.put("cc-paletted", new PlatformComputerCraft(true));
 //		PLATFORMS.put("oc-tier1", new PlatformOpenComputers(1));
-		PLATFORMS.put("oc-tier2", new PlatformOpenComputers(2));
-		PLATFORMS.put("oc-tier3", new PlatformOpenComputers(3));
+		PLATFORMS.put("oc-tier2", new PlatformOpenComputers(PlatformOpenComputers.Screen.TIER_2));
+		PLATFORMS.put("oc-tier3", new PlatformOpenComputers(PlatformOpenComputers.Screen.TIER_3));
 		PLATFORMS.put("zxspectrum", new PlatformZXSpectrum(0));
 		PLATFORMS.put("zxspectrum-dark", new PlatformZXSpectrum(1));
 

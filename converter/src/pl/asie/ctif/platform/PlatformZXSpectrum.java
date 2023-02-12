@@ -11,7 +11,7 @@ public class PlatformZXSpectrum extends Platform {
     }
 
     @Override
-    Color[] generatePalette() {
+    public Color[] generatePalette() {
         Color[] colors = new Color[paletteMode == 2 ? 16 : 8];
         colors[0] = new Color(0x000000);
         colors[1] = new Color(0x0000ff);

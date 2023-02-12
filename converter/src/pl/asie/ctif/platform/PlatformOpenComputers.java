@@ -3,37 +3,25 @@ package pl.asie.ctif.platform;
 import java.awt.*;
 
 public class PlatformOpenComputers extends Platform {
-    public final int tier;
-
-    public PlatformOpenComputers(int tier) {
-        super(1, 2, 4, 0, 0, 0);
-        this.tier = tier;
+    public enum Screen {
+        TIER_1,
+        TIER_2,
+        TIER_3;
     }
 
-    @Override
-    public int getCustomColorCount() {
-        return switch (tier) {
-            case 1 -> 0;
-            case 2, 3 -> 16;
-            default -> 0;
-        };
+    private final Screen screen;
+
+    public PlatformOpenComputers(Screen screen) {
+        super(1, 2, 4, 0, 0, 0);
+        this.screen = screen;
     }
 
     @Override
     public int getWidth() {
-        return switch (tier) {
-            case 1 -> 40;
-            case 2 -> 80;
-            case 3 -> 160;
-            default -> 0;
-        };
-    }
-
-    protected int getRealHeight() {
-        return switch (tier) {
-            case 1, 2 -> 25;
-            case 3 -> 50;
-            default -> 0;
+        return switch (screen) {
+            case TIER_1 -> 40;
+            case TIER_2 -> 80;
+            case TIER_3 -> 160;
         };
     }
 
@@ -43,19 +31,27 @@ public class PlatformOpenComputers extends Platform {
     }
 
     @Override
-    public float getDefaultAspectRatio() {
-        return (float) getWidth() / getRealHeight();
-    }
-
-    @Override
     public int getChars() {
         return getWidth() * getRealHeight();
     }
 
     @Override
+    public int getCustomColorCount() {
+        return switch (screen) {
+            case TIER_1 -> 0;
+            case TIER_2, TIER_3 -> 16;
+        };
+    }
+
+    @Override
+    public float getDefaultAspectRatio() {
+        return (float) getWidth() / getRealHeight();
+    }
+
+    @Override
     Color[] generatePalette() {
         Color[] colors = new Color[getColorCount()];
-        if (tier == 1) {
+        if (screen == Screen.TIER_1) {
             colors[0] = new Color(0, 0, 0);
             colors[1] = new Color(255, 255, 255);
         } else {
@@ -63,7 +59,7 @@ public class PlatformOpenComputers extends Platform {
                 colors[i] = new Color(17 * i, 17 * i, 17 * i);
             }
 
-            if (tier == 3) {
+            if (screen == Screen.TIER_3) {
                 for (int i = 0; i < 240; i++) {
                     colors[i + 16] = new Color(
                             ((i / 40) % 6) * 255 / 5,
@@ -76,12 +72,22 @@ public class PlatformOpenComputers extends Platform {
         return colors;
     }
 
-    protected int getColorCount() {
-        return switch (tier) {
-            case 1 -> 2;
-            case 2 -> 16;
-            case 3 -> 256;
-            default -> 0;
+    public Screen getScreen() {
+        return screen;
+    }
+
+    private int getColorCount() {
+        return switch (screen) {
+            case TIER_1 -> 2;
+            case TIER_2 -> 16;
+            case TIER_3 -> 256;
+        };
+    }
+
+    private int getRealHeight() {
+        return switch (screen) {
+            case TIER_1, TIER_2 -> 25;
+            case TIER_3 -> 50;
         };
     }
 }
