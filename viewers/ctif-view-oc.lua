@@ -21,13 +21,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ]]
 
-local args = {...}
 local component = require("component")
-local event = require("event")
 local gpu = component.gpu
+local event = require("event")
 local unicode = require("unicode")
 local os = require("os")
+
+local args = {...}
 local pal = {}
+local q = {}
 
 function quit(str)
   print("ERROR: " .. str)
@@ -229,7 +231,6 @@ function drawImage(data, offx, offy)
 end
 
 function main()
-  local q = {}
   for i=0,255 do
     local dat = (i & 0x01) << 7
     dat = dat | (i & 0x02) >> 1 << 6
