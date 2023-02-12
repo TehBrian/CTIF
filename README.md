@@ -47,6 +47,10 @@ before, generate `preview.png` as a preview of what the CTIF image will look lik
 ComputerCraft screen, and scale the output to a resolution of *at most* 102x57. By default, this will retain the aspect
 ratio; to ignore the aspect ratio and force the image to be ***exactly*** 102x57, add the `-N` flag.
 
+`java -jar CTIFConverter.jar -m oc-tier3 -W 320 -H 200 -o out.ctif in.png` is what I find works best to get as big of
+a picture as possible onto an OpenComputers tier 3 screen. (It's simply the tier 3 screen resolution of `160x50`, with
+the width `*2` and the height `*4`.)
+
 ## Viewers
 
 The viewers' code can be found in the `viewers` directory. In it, there are three files.
