@@ -33,13 +33,13 @@ public final class Utils {
 				cmd.run(new IMOperation());
 			} catch (Exception e) {
 				if (e.getCause() instanceof IOException) {
-					System.err.println("Warning: ImageMagick not found! Please install ImageMagick for improved scaling quality.");
+					System.out.println("Warning: ImageMagick not found! Please install ImageMagick for improved scaling quality.");
 					imMode = 0;
 				}
 			}
 
 			if (imMode == 1) {
-				System.err.println("ImageMagick found; using ImageMagick for resizing.");
+				System.out.println("ImageMagick found; using ImageMagick for resizing.");
 			}
 		}
 

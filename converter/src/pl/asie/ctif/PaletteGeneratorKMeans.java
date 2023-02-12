@@ -124,7 +124,7 @@ public class PaletteGeneratorKMeans {
         for (int i = 0; i < workers.length; i++) {
             Result result = workers[i].result;
             if (Main.DEBUG) {
-                System.out.println("Palette generator worker #" + (i + 1) + " error = " + result.error);
+                System.err.println("Palette generator worker #" + (i + 1) + " error = " + result.error);
             }
             if (bestResult == null || bestResult.error > result.error) {
                 bestResult = result;
@@ -132,7 +132,7 @@ public class PaletteGeneratorKMeans {
         }
 
         if (Main.DEBUG) {
-            System.out.println("Palette generator error = " + bestResult.error);
+            System.err.println("Palette generator error = " + bestResult.error);
         }
 
         return bestResult.colors;

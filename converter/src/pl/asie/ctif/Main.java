@@ -261,8 +261,6 @@ public class Main {
 			params.h = rCeil((int) Math.floor(y * a), PLATFORM.getCharHeight());
 		}
 
-		System.out.println(params.w + " " + params.h);
-
 		if (params.w * params.h > PLATFORM.getCharsPx()) {
 			System.err.printf("Size too large: %dx%d (maximum size: %d pixels)%n", params.w, params.h, PLATFORM.getCharsPx());
 			System.exit(1);
@@ -278,10 +276,10 @@ public class Main {
 		int height = params.h;
 
 		if (Main.DEBUG) {
-			System.err.println("Using " + params.threads + " threads.");
+			System.out.println("Using " + params.threads + " threads.");
 		}
 
-		System.err.println("Resizing image...");
+		System.out.println("Resizing image...");
 		long timeR = System.currentTimeMillis();
 
 		BufferedImage resizedImage;
@@ -295,12 +293,12 @@ public class Main {
 
 		timeR = System.currentTimeMillis() - timeR;
 		if (DEBUG) {
-			System.err.println("Image resize time: " + timeR + " ms");
+			System.out.println("Image resize time: " + timeR + " ms");
 		}
 
 		if (PLATFORM.getCustomColorCount() > 0) {
 			if (params.palette != null) {
-				System.err.println("Reading palette...");
+				System.out.println("Reading palette...");
 				try {
 					FileInputStream inputStream = new FileInputStream(params.palette);
 					for (int i = 0; i < PLATFORM.getCustomColorCount(); i++) {
@@ -315,17 +313,17 @@ public class Main {
 				}
 			} else {
 				long time = System.currentTimeMillis();
-				System.err.println("Generating palette...");
+				System.out.println("Generating palette...");
 				PaletteGeneratorKMeans generator = new PaletteGeneratorKMeans(resizedImage, palette, PLATFORM.getCustomColorCount(), params.paletteSamplingResolution);
 				palette = generator.generate(params.threads);
 				time = System.currentTimeMillis() - time;
 				if (DEBUG) {
-					System.err.println("Palette generation time: " + time + " ms");
+					System.out.println("Palette generation time: " + time + " ms");
 				}
 			}
 
 			if (params.paletteExport != null) {
-				System.err.println("Saving palette...");
+				System.out.println("Saving palette...");
 				try {
 					FileOutputStream outputStream = new FileOutputStream(params.paletteExport);
 					for (final Color color : palette) {
@@ -367,7 +365,7 @@ public class Main {
 				}
 			}
 
-			System.err.println("Converting image...");
+			System.out.println("Converting image...");
 
 			long time = System.currentTimeMillis();
 			Converter writer = new Converter(palette, resizedImage,
@@ -382,7 +380,7 @@ public class Main {
 			}
 			time = System.currentTimeMillis() - time;
 			if (DEBUG) {
-				System.err.println("Image conversion time: " + time + " ms");
+				System.out.println("Image conversion time: " + time + " ms");
 			}
 
 			if (params.previewFilename != null) {
