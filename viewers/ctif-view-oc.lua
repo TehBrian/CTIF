@@ -42,7 +42,7 @@ for i=0,255 do
   q[i + 1] = unicode.char(0x2800 | dat)
 end
 
-function error(str)
+function quit(str)
   print("ERROR: " .. str)
   os.exit()
 end
@@ -89,7 +89,7 @@ function loadImage(filename)
 
   for i=1,4 do
     if r8(file) ~= hdr[i] then
-      error("Invalid header!")
+      quit("Invalid header!")
     end
   end
 
@@ -98,11 +98,11 @@ function loadImage(filename)
   local platformId = r16(file)
 
   if hdrVersion > 1 then
-    error("Unknown header version: " .. hdrVersion)
+    quit("Unknown header version: " .. hdrVersion)
   end
 
   if platformId ~= 1 or platformVariant ~= 0 then
-    error("Unsupported platform ID: " .. platformId .. ":" .. platformVariant)
+    quit("Unsupported platform ID: " .. platformId .. ":" .. platformVariant)
   end
 
   data[1] = {}
@@ -116,21 +116,21 @@ function loadImage(filename)
   local pw = r8(file)
   local ph = r8(file)
   if not (pw == 2 and ph == 4) then
-    error("Unsupported character width: " .. pw .. "x" .. ph)
+    quit("Unsupported character width: " .. pw .. "x" .. ph)
   end
 
   data[2][3] = r8(file)
   if (data[2][3] ~= 4 and data[2][3] ~= 8) or data[2][3] > gpu.getDepth() then
-    error("Unsupported bit depth: " .. data[2][3])
+    quit("Unsupported bit depth: " .. data[2][3])
   end
 
   local ccEntrySize = r8(file)
   local customColors = r16(file)
   if customColors > 0 and ccEntrySize ~= 3 then
-    error("Unsupported palette entry size: " .. ccEntrySize)
+    quit("Unsupported palette entry size: " .. ccEntrySize)
   end
   if customColors > 16 then
-    error("Unsupported palette entry amount: " .. customColors)
+    quit("Unsupported palette entry amount: " .. customColors)
   end
 
   for p=0,customColors-1 do
