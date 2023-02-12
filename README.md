@@ -56,4 +56,4 @@ The viewers' code can be found in the `viewers` directory. In it, there are thre
 * `ctif-view-cc.lua` - CTIF viewer for ComputerCraft 1.79-. Usage: `ctif-view-cc <file> [monitor side]`. If you see
   errors about the image size being too large, keep in mind that the viewer operates on *characters* while the converter
   operates on *pixels*. To convert from characters to pixels, multiply the width by 2 and the height by 3.
-* `ctif-view-cc-1.80.lua` - CTIF viewer for ComputerCraft 1.80+.
+* `ctif-view-cc-1.8.lua` - CTIF viewer for ComputerCraft 1.80+.
