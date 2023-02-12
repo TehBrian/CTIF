@@ -19,7 +19,7 @@ public class PlatformOpenComputers extends Platform {
     @Override
     public int getWidth() {
         return switch (screen) {
-            case TIER_1 -> 40;
+            case TIER_1 -> 50;
             case TIER_2 -> 80;
             case TIER_3 -> 160;
         };
@@ -86,7 +86,8 @@ public class PlatformOpenComputers extends Platform {
 
     private int getRealHeight() {
         return switch (screen) {
-            case TIER_1, TIER_2 -> 25;
+            case TIER_1 -> 16;
+            case TIER_2 -> 25;
             case TIER_3 -> 50;
         };
     }
