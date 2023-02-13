@@ -246,6 +246,10 @@ function drawImage(data, offx, offy)
   end
 end
 
+function displayImage(path)
+  drawImage(loadImage(path))
+end
+
 function resetScreen()
   gpu.setBackground(0, false) -- black bg.
   gpu.setForeground(16777215, false) -- white fg.
@@ -257,7 +261,7 @@ function resetScreen()
 end
 
 function main()
-  drawImage(loadImage(args[1]))
+  displayImage(args[1])
   event.pull("key_down") -- block until key is pressed.
   resetScreen()
 end
