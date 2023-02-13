@@ -24,6 +24,7 @@ SOFTWARE.
 local component = require("component")
 local gpu = component.gpu
 local os = require("os")
+local term = require("term")
 local unicode = require("unicode")
 
 function abort(message)

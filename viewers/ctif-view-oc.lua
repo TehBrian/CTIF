@@ -25,6 +25,7 @@ local component = require("component")
 local event = require("event")
 local gpu = component.gpu
 local os = require("os")
+local term = require("term")
 local unicode = require("unicode")
 
 local args = {...}
