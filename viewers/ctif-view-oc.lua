@@ -28,7 +28,6 @@ local os = require("os")
 local unicode = require("unicode")
 
 local args = {...}
-local pal = {}
 
 function abort(message)
   print("Error: " .. message)
@@ -67,7 +66,9 @@ function gpuFG()
   end
 end
 
-function resetPalette(data)
+function generatePalette(data)
+  local pal = {}
+
   for i = 0, 255 do
     if (i < 16) then
       if data == nil or data[3] == nil or data[3][i] == nil then
@@ -84,6 +85,8 @@ function resetPalette(data)
       pal[i] = r << 16 | g << 8 | b
     end
   end
+
+  return pal
 end
 
 function loadImage(filename)
@@ -169,7 +172,8 @@ function drawImage(data, offx, offy)
   local HEIGHT = data[2][2]
 
   gpu.setResolution(WIDTH, HEIGHT)
-  resetPalette(data)
+
+  local pal = generatePalette(data)
 
   local bg = 0
   local fg = 0
@@ -243,8 +247,6 @@ function drawImage(data, offx, offy)
 end
 
 function main()
-  resetPalette(nil)
-
   local image = loadImage(args[1])
   drawImage(image)
 
