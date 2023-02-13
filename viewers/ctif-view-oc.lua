@@ -256,11 +256,8 @@ function resetScreen()
 end
 
 function main()
-  local image = loadImage(args[1])
-  drawImage(image)
-
+  drawImage(loadImage(args[1]))
   event.pull("key_down") -- block until key is pressed.
-
   resetScreen()
 end
 
