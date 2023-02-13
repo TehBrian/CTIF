@@ -250,20 +250,23 @@ function displayImage(path)
   drawImage(loadImage(path))
 end
 
-function resetScreen()
+function resetResolution()
+  local x, y = gpu.maxResolution()
+  gpu.setResolution(x, y)
+end
+
+function clearScreen()
   gpu.setBackground(0, false) -- black bg.
   gpu.setForeground(16777215, false) -- white fg.
-
-  local x, y = gpu.maxResolution()
-  gpu.setResolution(x, y) -- set to max resolution.
-
   term.clear()
 end
 
 function main()
   displayImage(args[1])
   event.pull("key_down") -- block until key is pressed.
-  resetScreen()
+  -- reset resolution first to avoid frame of blank screen with old resolution.
+  resetResolution()
+  clearScreen()
 end
 
 main()
