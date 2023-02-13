@@ -138,7 +138,7 @@ if (xoff < 0) or (yoff < 0) then
 end
 
 -- Draw
-for y=0,height-1 do 
+for y=0,height-1 do
 local bgs = ""
 local fgs = ""
 local chs = ""
