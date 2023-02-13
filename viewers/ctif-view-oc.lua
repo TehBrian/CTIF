@@ -96,7 +96,7 @@ function loadImage(filename)
 
   for i = 1, 4 do
     if r8(file) ~= hdr[i] then
-      abort("Invalid header!")
+      abort("Invalid header.")
     end
   end
 
