@@ -22,18 +22,18 @@ SOFTWARE.
 ]]
 
 local component = require("component")
-local gpu = component.gpu
 local event = require("event")
-local unicode = require("unicode")
+local gpu = component.gpu
 local os = require("os")
+local unicode = require("unicode")
 
 local args = {...}
 local pal = {}
 local q = {}
 
-function quit(str)
-  print("ERROR: " .. str)
-  os.exit()
+function abort(message)
+  print("Error: " .. message)
+  os.exit(1)
 end
 
 function r8(file)
@@ -94,7 +94,7 @@ function loadImage(filename)
 
   for i = 1, 4 do
     if r8(file) ~= hdr[i] then
-      quit("Invalid header!")
+      abort("Invalid header!")
     end
   end
 
@@ -103,11 +103,11 @@ function loadImage(filename)
   local platformId = r16(file)
 
   if hdrVersion > 1 then
-    quit("Unknown header version: " .. hdrVersion)
+    abort("Unknown header version: " .. hdrVersion)
   end
 
   if platformId ~= 1 or platformVariant ~= 0 then
-    quit("Unsupported platform ID: " .. platformId .. ":" .. platformVariant)
+    abort("Unsupported platform ID: " .. platformId .. ":" .. platformVariant)
   end
 
   data[1] = {}
@@ -121,21 +121,21 @@ function loadImage(filename)
   local pw = r8(file)
   local ph = r8(file)
   if not (pw == 2 and ph == 4) then
-    quit("Unsupported character width: " .. pw .. "x" .. ph)
+    abort("Unsupported character width: " .. pw .. "x" .. ph)
   end
 
   data[2][3] = r8(file)
   if (data[2][3] ~= 4 and data[2][3] ~= 8) or data[2][3] > gpu.getDepth() then
-    quit("Unsupported bit depth: " .. data[2][3])
+    abort("Unsupported bit depth: " .. data[2][3])
   end
 
   local ccEntrySize = r8(file)
   local customColors = r16(file)
   if customColors > 0 and ccEntrySize ~= 3 then
-    quit("Unsupported palette entry size: " .. ccEntrySize)
+    abort("Unsupported palette entry size: " .. ccEntrySize)
   end
   if customColors > 16 then
-    quit("Unsupported palette entry amount: " .. customColors)
+    abort("Unsupported palette entry amount: " .. customColors)
   end
 
   for p = 0, customColors - 1 do
