@@ -29,7 +29,6 @@ local unicode = require("unicode")
 
 local args = {...}
 local pal = {}
-local q = {}
 
 function abort(message)
   print("Error: " .. message)
@@ -182,6 +181,19 @@ function drawImage(data, offx, offy)
   local gBG = gpuBG()
   local gFG = gpuFG()
 
+  local q = {}
+  for i = 0, 255 do
+    local dat = (i & 0x01) << 7
+    dat = dat | (i & 0x02) >> 1 << 6
+    dat = dat | (i & 0x04) >> 2 << 5
+    dat = dat | (i & 0x08) >> 3 << 2
+    dat = dat | (i & 0x10) >> 4 << 4
+    dat = dat | (i & 0x20) >> 5 << 1
+    dat = dat | (i & 0x40) >> 6 << 3
+    dat = dat | (i & 0x80) >> 7
+    q[i + 1] = unicode.char(0x2800 | dat)
+  end
+
   for y = 0, HEIGHT - 1 do
     local str = ""
     for x = 0, WIDTH - 1 do
@@ -231,18 +243,6 @@ function drawImage(data, offx, offy)
 end
 
 function main()
-  for i = 0, 255 do
-    local dat = (i & 0x01) << 7
-    dat = dat | (i & 0x02) >> 1 << 6
-    dat = dat | (i & 0x04) >> 2 << 5
-    dat = dat | (i & 0x08) >> 3 << 2
-    dat = dat | (i & 0x10) >> 4 << 4
-    dat = dat | (i & 0x20) >> 5 << 1
-    dat = dat | (i & 0x40) >> 6 << 3
-    dat = dat | (i & 0x80) >> 7
-    q[i + 1] = unicode.char(0x2800 | dat)
-  end
-
   resetPalette(nil)
 
   local image = loadImage(args[1])
