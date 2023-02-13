@@ -252,7 +252,8 @@ function resetScreen()
 
   local x, y = gpu.maxResolution()
   gpu.setResolution(x, y) -- set to max resolution.
-  gpu.fill(1, 1, x, y, " ") -- clear screen.
+
+  term.clear()
 end
 
 function main()
