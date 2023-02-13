@@ -246,16 +246,22 @@ function drawImage(data, offx, offy)
   end
 end
 
+function resetScreen()
+  gpu.setBackground(0, false) -- black bg.
+  gpu.setForeground(16777215, false) -- white fg.
+
+  local x, y = gpu.maxResolution()
+  gpu.setResolution(x, y) -- set to max resolution.
+  gpu.fill(1, 1, x, y, " ") -- clear screen.
+end
+
 function main()
   local image = loadImage(args[1])
   drawImage(image)
 
   event.pull("key_down") -- block until key is pressed.
 
-  gpu.setBackground(0, false)
-  gpu.setForeground(16777215, false)
-  gpu.setResolution(80, 25)
-  gpu.fill(1, 1, 80, 25, " ")
+  resetScreen()
 end
 
 main()
