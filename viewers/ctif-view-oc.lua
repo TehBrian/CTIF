@@ -250,12 +250,7 @@ function main()
   local image = loadImage(args[1])
   drawImage(image)
 
-  while true do
-    local key = event.pull("key_down")
-    if key == 0x10 then
-      break
-    end
-  end
+  event.pull("key_down") -- block until key is pressed.
 
   gpu.setBackground(0, false)
   gpu.setForeground(16777215, false)
