@@ -19,4 +19,8 @@ if not hasSuffix then
   saveLoc = saveLoc .. ".ctif"
 end
 
-shell.execute("wget https://thbn.me/ctif-provider/?url=" .. url .. " " .. saveLoc)
+shell.execute("wget <server>?url=" .. url .. " " .. saveLoc)
+
+if #args > 2 and args[3] == "view" then
+  shell.execute("ctif-view-oc " .. saveLoc)
+end
