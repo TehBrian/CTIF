@@ -1,8 +1,8 @@
 package pl.asie.ctif.convert.colorspace;
 
 public abstract class Colorspace {
-  public static final Colorspace YIQ;
   public static final Colorspace YUV;
+  public static final Colorspace YIQ;
   public static final Colorspace RGB;
 
   static {
@@ -33,6 +33,10 @@ public abstract class Colorspace {
     };
   }
 
+  public abstract float[] fromRGB(float[] value);
+
+  public abstract float[] toRGBArray(float[] value);
+
   public int toRGB(float[] value) {
     float[] rgb = toRGBArray(value);
     if (rgb[0] < 0) rgb[0] = 0;
@@ -51,8 +55,4 @@ public abstract class Colorspace {
         (float) (value & 0xFF) / 255.0f
     });
   }
-
-  public abstract float[] fromRGB(float[] value);
-
-  public abstract float[] toRGBArray(float[] value);
 }

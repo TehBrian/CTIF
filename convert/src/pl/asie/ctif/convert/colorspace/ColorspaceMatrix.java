@@ -1,12 +1,10 @@
 package pl.asie.ctif.convert.colorspace;
 
 public class ColorspaceMatrix extends Colorspace {
-  private final Colorspace parent;
   private final float[] matrixFromRGB;
   private final float[] matrixToRGB;
 
   protected ColorspaceMatrix(float[] matrix) {
-    this.parent = null;
     this.matrixFromRGB = matrix;
     this.matrixToRGB = new float[9];
     float detInv = 1f / (matrix[0] * matrix[4] * matrix[8] + matrix[1] * matrix[5] * matrix[6] + matrix[2] * matrix[3] * matrix[7]
@@ -32,11 +30,11 @@ public class ColorspaceMatrix extends Colorspace {
 
   @Override
   public float[] fromRGB(float[] value) {
-    return mmul3(parent != null ? parent.fromRGB(value) : value, matrixFromRGB);
+    return mmul3(value, matrixFromRGB);
   }
 
   @Override
   public float[] toRGBArray(float[] value) {
-    return parent != null ? parent.toRGBArray(mmul3(value, matrixToRGB)) : mmul3(value, matrixToRGB);
+    return mmul3(value, matrixToRGB);
   }
 }
