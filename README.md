@@ -28,7 +28,8 @@ it yourself or grab a CTIFConverter JAR at the GitHub [Releases](https://github.
 
 Then, simply run the JAR as a Java application through the terminal.
 
-You **must** have at *minimum* Java 8 installed, preferably Java 17.
+### Notes
+The application requires a runtime of at minimum Java 17.
 
 Additionally, if you're using Windows, download [im4java](https://im4java.sourceforge.net/) and add the path to an ENV
 variable called `IM4JAVA_TOOLPATH`.
