@@ -1,4 +1,4 @@
-package pl.asie.ctif;
+package pl.asie.ctif.convert;
 
 import java.awt.image.BufferedImage;
 

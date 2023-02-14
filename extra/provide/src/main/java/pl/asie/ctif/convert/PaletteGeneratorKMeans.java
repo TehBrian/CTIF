@@ -1,4 +1,4 @@
-package pl.asie.ctif;
+package pl.asie.ctif.convert;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -75,7 +75,7 @@ public class PaletteGeneratorKMeans {
           }
         }
       } else {
-        for (int i : Utils.getRGB(image)) {
+        for (int i : Util.getRGB(image)) {
           if (!pointsAdded.containsKey(i)) {
             float[] key = Main.COLORSPACE.fromRGB(i);
             pointsAdded.put(i, key);
@@ -95,7 +95,7 @@ public class PaletteGeneratorKMeans {
       double bestError = Float.MAX_VALUE;
       int bestCentroid = 0;
       for (int i = colors; i < centroids.length; i++) {
-        double err = Utils.getColorDistanceSq(weight.getKey(), centroids[i]);
+        double err = Util.getColorDistanceSq(weight.getKey(), centroids[i]);
         if (err < bestError) {
           bestError = err;
           bestCentroid = i;
@@ -159,7 +159,7 @@ public class PaletteGeneratorKMeans {
         int mul = weight.getValue();
 
         for (int i = 0; i < colors; i++) {
-          double err = Utils.getColorDistanceSq(weight.getKey(), centroids[i]);
+          double err = Util.getColorDistanceSq(weight.getKey(), centroids[i]);
           if (err < bestError) {
             bestError = err;
             bestCentroid = i;

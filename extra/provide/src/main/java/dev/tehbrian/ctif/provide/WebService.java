@@ -1,4 +1,4 @@
-package dev.tehbrian.ctif.converter;
+package dev.tehbrian.ctif.provide;
 
 import com.github.kokorin.jaffree.ffmpeg.FFmpeg;
 import com.github.kokorin.jaffree.ffmpeg.FrameOutput;
@@ -10,10 +10,10 @@ import io.javalin.http.HttpStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jspecify.annotations.Nullable;
-import pl.asie.ctif.Converter;
-import pl.asie.ctif.Main;
-import pl.asie.ctif.colorspace.Colorspace;
-import pl.asie.ctif.platform.PlatformOpenComputers;
+import pl.asie.ctif.convert.Converter;
+import pl.asie.ctif.convert.Main;
+import pl.asie.ctif.convert.colorspace.Colorspace;
+import pl.asie.ctif.convert.platform.PlatformOpenComputers;
 
 import java.net.URI;
 import java.net.http.HttpClient;

@@ -1,8 +1,8 @@
-package pl.asie.ctif;
+package pl.asie.ctif.convert;
 
-import pl.asie.ctif.platform.PlatformComputerCraft;
-import pl.asie.ctif.platform.PlatformOpenComputers;
-import pl.asie.ctif.platform.PlatformZXSpectrum;
+import pl.asie.ctif.convert.platform.PlatformComputerCraft;
+import pl.asie.ctif.convert.platform.PlatformOpenComputers;
+import pl.asie.ctif.convert.platform.PlatformZXSpectrum;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -106,7 +106,15 @@ public class Converter {
 
   private void addQuantError(float[][] pixelArray, int x, int y, int w, int h, float[] expected, float[] received, float mul) {
     if (x >= 0 && y >= 0 && x < w && y < h) {
-      Utils.addQuantError(pixelArray[y * w + x], expected, received, mul);
+      addQuantError(pixelArray[y * w + x], expected, received, mul);
+    }
+  }
+
+  public static void addQuantError(float[] target, float[] expected, float[] received, float mul) {
+    if (mul != 0.0f) {
+      for (int i = 0; i < target.length; i++) {
+        target[i] += (expected[i] - received[i]) * mul;
+      }
     }
   }
 
@@ -187,7 +195,7 @@ public class Converter {
             for (int cim1 = 0; cim1 < palMapLength; cim1++) {
               int ci1 = usePalMap ? palMap[cim1] : cim1;
               float[] col1 = pal[ci1];
-              double dist = Utils.getColorDistanceSq(col1, pixel);
+              double dist = Util.getColorDistanceSq(col1, pixel);
               if (dist < bestDist) {
                 bestCol = ci1;
                 bestDist = dist;
@@ -208,8 +216,8 @@ public class Converter {
 
             for (int i = 0; i < pixels.length; i++) {
               int pos = (pw * ph - 1 - i);
-              double dist0 = Utils.getColorDistanceSq(pal[bci1], pixels[i]);
-              double dist1 = Utils.getColorDistanceSq(pal[bci2], pixels[i]);
+              double dist0 = Util.getColorDistanceSq(pal[bci1], pixels[i]);
+              double dist1 = Util.getColorDistanceSq(pal[bci2], pixels[i]);
               if (dist1 < dist0) {
                 bcq[pos >> 3] |= (1 << (pos & 7));
               }
@@ -238,8 +246,8 @@ public class Converter {
               if (ditherMode == DitherMode.NONE) {
                 for (int i = 0; i < pixels.length; i++) {
                   float[] col = pixels[i];
-                  double cerr1 = Utils.getColorDistanceSq(col, col1);
-                  double cerr2 = Utils.getColorDistanceSq(col, col2);
+                  double cerr1 = Util.getColorDistanceSq(col, col1);
+                  double cerr2 = Util.getColorDistanceSq(col, col2);
                   if (cerr2 < cerr1) {
                     int pos = (pw * ph - 1 - i);
                     cq[pos >> 3] |= (1 << (pos & 7));
@@ -267,8 +275,8 @@ public class Converter {
                 for (int i = 0; i < tPixels.length; i++) {
                   float[] col = tPixels[i];
                   float[] colR;
-                  double cerr1 = Utils.getColorDistanceSq(col, col1);
-                  double cerr2 = Utils.getColorDistanceSq(col, col2);
+                  double cerr1 = Util.getColorDistanceSq(col, col1);
+                  double cerr2 = Util.getColorDistanceSq(col, col2);
                   if (cerr2 < cerr1) {
                     int pos = (pw * ph - 1 - i);
                     cq[pos >> 3] |= (1 << (pos & 7));
@@ -297,7 +305,7 @@ public class Converter {
               } else {
                 // http://bisqwit.iki.fi/story/howto/dither/jy/
 
-                cerr += Utils.getColorDistanceSq(col1, col2) * 0.1 * pixels.length;
+                cerr += Util.getColorDistanceSq(col1, col2) * 0.1 * pixels.length;
 
                 for (int i = 0; i < pixels.length; i++) {
                   float[] col = pixels[i];
@@ -318,7 +326,7 @@ public class Converter {
                   colA[0] = (col2[0] * birat + col1[0] * (ditherMax - birat)) / ditherMax;
                   colA[1] = (col2[1] * birat + col1[1] * (ditherMax - birat)) / ditherMax;
                   colA[2] = (col2[2] * birat + col1[2] * (ditherMax - birat)) / ditherMax;
-                  cerr += Utils.getColorDistanceSq(col, colA);
+                  cerr += Util.getColorDistanceSq(col, colA);
 
                   if (cerr >= bcerr)
                     break;

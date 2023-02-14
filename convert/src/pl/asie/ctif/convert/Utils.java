@@ -1,9 +1,9 @@
-package pl.asie.ctif;
+package pl.asie.ctif.convert;
 
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IMOperation;
 import org.im4java.core.Stream2BufferedImage;
-import pl.asie.ctif.colorspace.Colorspace;
+import pl.asie.ctif.convert.colorspace.Colorspace;
 
 import javax.imageio.ImageIO;
 import java.awt.Graphics2D;

@@ -1,4 +1,4 @@
-package dev.tehbrian.ctif.converter;
+package dev.tehbrian.ctif.provide;
 
 public final class Main {
 

@@ -1,12 +1,12 @@
-package pl.asie.ctif;
+package pl.asie.ctif.convert;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import pl.asie.ctif.colorspace.Colorspace;
-import pl.asie.ctif.platform.Platform;
-import pl.asie.ctif.platform.PlatformComputerCraft;
-import pl.asie.ctif.platform.PlatformOpenComputers;
-import pl.asie.ctif.platform.PlatformZXSpectrum;
+import pl.asie.ctif.convert.colorspace.Colorspace;
+import pl.asie.ctif.convert.platform.Platform;
+import pl.asie.ctif.convert.platform.PlatformComputerCraft;
+import pl.asie.ctif.convert.platform.PlatformOpenComputers;
+import pl.asie.ctif.convert.platform.PlatformZXSpectrum;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;

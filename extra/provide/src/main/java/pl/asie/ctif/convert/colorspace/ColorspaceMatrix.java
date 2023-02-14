@@ -1,4 +1,4 @@
-package pl.asie.ctif.colorspace;
+package pl.asie.ctif.convert.colorspace;
 
 public class ColorspaceMatrix extends Colorspace {
   private final Colorspace parent;

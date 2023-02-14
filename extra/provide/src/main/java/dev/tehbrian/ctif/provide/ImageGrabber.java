@@ -1,4 +1,4 @@
-package dev.tehbrian.ctif.converter;
+package dev.tehbrian.ctif.provide;
 
 import com.github.kokorin.jaffree.ffmpeg.Frame;
 import com.github.kokorin.jaffree.ffmpeg.FrameConsumer;

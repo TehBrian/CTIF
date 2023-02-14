@@ -1,4 +1,4 @@
-package pl.asie.ctif.colorspace;
+package pl.asie.ctif.convert.colorspace;
 
 public abstract class Colorspace {
   public static final Colorspace YIQ;
