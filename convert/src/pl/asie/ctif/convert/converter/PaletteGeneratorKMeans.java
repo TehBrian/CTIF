@@ -14,6 +14,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class PaletteGeneratorKMeans {
+  private static int[] getRGB(BufferedImage image) {
+    return image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
+  }
+
   record Result(Color[] colors, double error) {
   }
 
@@ -86,7 +90,7 @@ public class PaletteGeneratorKMeans {
           }
         }
       } else {
-        for (int i : Util.getRGB(image)) {
+        for (int i : getRGB(image)) {
           if (!pointsAdded.containsKey(i)) {
             float[] key = this.colorspace.fromRGB(i);
             pointsAdded.put(i, key);

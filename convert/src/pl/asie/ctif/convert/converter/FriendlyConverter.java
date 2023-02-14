@@ -1,9 +1,9 @@
 package pl.asie.ctif.convert.converter;
 
-import pl.asie.ctif.convert.Util;
 import pl.asie.ctif.convert.colorspace.AbstractColorspace;
 import pl.asie.ctif.convert.platform.AbstractPlatform;
 
+import javax.imageio.ImageIO;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -18,6 +18,14 @@ public class FriendlyConverter {
       return x - (x % y) + y;
     } else {
       return x;
+    }
+  }
+
+  private static void saveImage(BufferedImage image, String location) {
+    try {
+      ImageIO.write(image, "png", new File(location));
+    } catch (Exception e) {
+      e.printStackTrace();
     }
   }
 
@@ -199,7 +207,7 @@ public class FriendlyConverter {
       }
 
       if (previewFilename != null) {
-        Util.saveImage(Resizer.speedyResize(outputImage, width * 2, height * 2), new File(previewFilename).getAbsolutePath());
+        saveImage(Resizer.speedyResize(outputImage, width * 2, height * 2), new File(previewFilename).getAbsolutePath());
       }
 
       return new Result(outputImage, outputData);

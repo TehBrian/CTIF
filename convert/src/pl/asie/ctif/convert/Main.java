@@ -8,7 +8,9 @@ import pl.asie.ctif.convert.converter.Resizer;
 import pl.asie.ctif.convert.converter.UglyConverter;
 import pl.asie.ctif.convert.platform.Platform;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -91,7 +93,7 @@ public class Main {
     }
 
     String inputPath = params.files.get(0);
-    BufferedImage input = Util.loadImage(inputPath);
+    BufferedImage input = loadImage(inputPath);
     if (input == null) {
       System.err.printf("Failed to read input image: %s%n", inputPath);
       System.exit(1);
@@ -124,6 +126,19 @@ public class Main {
       System.err.printf("Failed to write output image: %s%n", outputName);
       e.printStackTrace();
       System.exit(1);
+    }
+  }
+
+  public static BufferedImage loadImage(String location) {
+    try {
+      if (location.equals("-")) {
+        return ImageIO.read(System.in);
+      } else {
+        return ImageIO.read(new File(location));
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      return null;
     }
   }
 }
