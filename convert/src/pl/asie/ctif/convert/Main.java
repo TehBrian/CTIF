@@ -4,7 +4,7 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import org.jspecify.annotations.Nullable;
 import pl.asie.ctif.convert.colorspace.Colorspace;
-import pl.asie.ctif.convert.converter.FriendlyConverter;
+import pl.asie.ctif.convert.converter.Converter;
 import pl.asie.ctif.convert.converter.Resizer;
 import pl.asie.ctif.convert.converter.UglyConverter;
 import pl.asie.ctif.convert.platform.Platform;
@@ -100,7 +100,7 @@ public class Main {
       System.exit(1);
     }
 
-    FriendlyConverter.Result result = FriendlyConverter.convertImage(
+    Converter.Result result = Converter.convertImage(
         params.mode.get(),
         params.colorspace.get(),
         params.optimizationLevel,

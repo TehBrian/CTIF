@@ -12,7 +12,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Arrays;
 
-public class FriendlyConverter {
+public class Converter {
   private static int rCeil(int x, int y) {
     if (x % y > 0) {
       return x - (x % y) + y;
