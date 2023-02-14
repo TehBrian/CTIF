@@ -18,9 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class Main {
   private static class Parameters {
@@ -79,13 +77,7 @@ public class Main {
     private boolean help;
 
     @Parameter(names = {"--resize-mode"}, description = "Resize mode")
-    private ResizeMode resizeMode;
-  }
-
-  public enum ResizeMode {
-    SPEED,
-    QUALITY_NATIVE,
-    QUALITY
+    private Resizer.Mode resizeMode;
   }
 
   private static int rCeil(int x, int y) {
@@ -109,7 +101,7 @@ public class Main {
       int h,
       final boolean ignoreAspectRatio,
       final int threads,
-      final ResizeMode resizeMode,
+      final Resizer.Mode resizeMode,
       final String palette,
       final int paletteSamplingResolution,
       final String paletteExport,
@@ -173,10 +165,10 @@ public class Main {
     BufferedImage resizedImage;
     if (image.getWidth() == width && image.getHeight() == height) {
       resizedImage = image;
-    } else if (resizeMode == ResizeMode.SPEED) {
-      resizedImage = Util.resizeBox(image, width, height);
+    } else if (resizeMode == Resizer.Mode.SPEED) {
+      resizedImage = Resizer.speedyResize(image, width, height);
     } else {
-      resizedImage = Util.resize(image, width, height, resizeMode == ResizeMode.QUALITY_NATIVE);
+      resizedImage = Resizer.qualityResize(image, width, height, resizeMode == Resizer.Mode.QUALITY_NATIVE);
     }
 
     timeR = System.currentTimeMillis() - timeR;
@@ -274,7 +266,7 @@ public class Main {
       }
 
       if (previewFilename != null) {
-        Util.saveImage(Util.resizeBox(outputImage, width * 2, height * 2), new File(previewFilename).getAbsolutePath());
+        Util.saveImage(Resizer.speedyResize(outputImage, width * 2, height * 2), new File(previewFilename).getAbsolutePath());
       }
 
       return new Result(outputImage, outputData);
