@@ -19,11 +19,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
+  @SuppressWarnings("FieldMayBeFinal")
   private static class Parameters {
-    @Parameter(names = {"--palette-sampling-resolution"}, description = "The sampling resolution for palette generation. 0 = full image (1/4x1/4 image in -O3+)")
+    @Parameter(names = {"--palette-sampling-resolution"}, description = "The sampling resolution for palette generation. 0 means full image. (1/4x1/4 image in -O3+)")
     private int paletteSamplingResolution = 0;
 
-    @Parameter(names = {"--threads"}, description = "Amount of threads to create")
+    @Parameter(names = {"--threads"}, description = "Amount of threads to create.")
     private int threads = Runtime.getRuntime().availableProcessors();
 
     @Parameter(names = {"--palette-export"}, description = "File to export the palette to.")
@@ -32,49 +33,49 @@ public class Main {
     @Parameter(names = {"--palette"}, description = "File to load the palette from.")
     private String palette;
 
-    @Parameter(names = {"-m", "--mode"}, description = "Target platform (cc, cc-paletted, oc-tier2, oc-tier3)")
+    @Parameter(names = {"-m", "--mode"}, description = "Target platform.")
     private Platform mode = Platform.OC_TIER_3;
 
-    @Parameter(names = {"-O", "--optimization-level"}, description = "Optimization level [primarily 0-4]. Larger levels = less accurate but faster generated images. Default is 1.")
+    @Parameter(names = {"-O", "--optimization-level"}, description = "Optimization level. Primarily 0-4. Larger levels are less accurate but generate faster.")
     private int optimizationLevel = 1;
 
-    @Parameter(names = {"--colorspace"}, description = "Colorspace (rgb, yuv, yiq)")
+    @Parameter(names = {"--colorspace"}, description = "Image colorspace.")
     private Colorspace colorspace = Colorspace.YIQ;
 
-    @Parameter(names = {"--dither-mode"}, description = "Dither mode (none, error, ordered)")
+    @Parameter(names = {"--dither-mode"}, description = "Dither mode.")
     private UglyConverter.DitherMode ditherMode = UglyConverter.DitherMode.ERROR;
 
-    @Parameter(names = {"--dither-type"}, description = "Dither type (error: floyd-steinberg, sierra-lite; ordered: 2x2, 4x4, 8x8)")
+    @Parameter(names = {"--dither-type"}, description = "Dither type. (error: floyd-steinberg, sierra-lite; ordered: 2x2, 4x4, 8x8)")
     private String ditherType;
 
-    @Parameter(names = {"--dither-level"}, description = "Dither level for error-type dither. 0 = off, 1 = full (default)")
+    @Parameter(names = {"--dither-level"}, description = "Dither level for error-type dither. 0 = off, 1 = full.")
     private float ditherLevel = 1.0f;
 
-    @Parameter(names = {"-d", "--debug"}, description = "Enable debugging", hidden = true)
+    @Parameter(names = {"-d", "--debug"}, description = "Enable debugging.", hidden = true)
     private boolean debug = false;
 
-    @Parameter(names = {"-W", "--width"}, description = "Output image width")
+    @Parameter(names = {"-W", "--width"}, description = "Output image width.")
     private int w;
 
-    @Parameter(names = {"-H", "--height"}, description = "Output image height")
+    @Parameter(names = {"-H", "--height"}, description = "Output image height.")
     private int h;
 
-    @Parameter(names = {"-N", "--no-aspect"}, description = "Ignore aspect ratio")
+    @Parameter(names = {"-N", "--no-aspect"}, description = "Ignore aspect ratio.")
     private boolean ignoreAspectRatio = false;
 
-    @Parameter(names = {"-o", "--output"}, description = "Output filename")
+    @Parameter(names = {"-o", "--output"}, description = "Output filename.")
     private String outputFilename;
 
-    @Parameter(names = {"-P", "--preview"}, description = "Preview image filename")
+    @Parameter(names = {"-P", "--preview"}, description = "Preview image filename.")
     private String previewFilename;
 
-    @Parameter(description = "Input file")
+    @Parameter(description = "Input file.")
     private List<String> files = new ArrayList<>();
 
-    @Parameter(names = {"-h", "--help"}, description = "Print usage", help = true)
+    @Parameter(names = {"-h", "--help"}, description = "Print usage.", help = true)
     private boolean help;
 
-    @Parameter(names = {"--resize-mode"}, description = "Resize mode")
+    @Parameter(names = {"--resize-mode"}, description = "Resize mode.")
     private Resizer.Mode resizeMode;
   }
 
