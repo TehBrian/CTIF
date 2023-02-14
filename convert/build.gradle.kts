@@ -1,11 +1,11 @@
 plugins {
-  id("java")
+  id("java-library")
+  id("maven-publish")
   id("com.github.johnrengelman.shadow") version "7.0.0"
 }
 
-java {
-  toolchain.languageVersion.set(JavaLanguageVersion.of(17))
-}
+group = "pl.asie.ctif"
+version = "0.1.0"
 
 repositories {
   mavenCentral()
@@ -16,8 +16,12 @@ dependencies {
   implementation("com.beust:jcommander:1.82")
 }
 
-java.sourceSets["main"].java {
-  srcDir("src")
+java {
+  toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+
+  sourceSets["main"].java {
+    srcDir("src")
+  }
 }
 
 tasks {
@@ -29,5 +33,19 @@ tasks {
 
   build {
     dependsOn(shadowJar)
+  }
+}
+
+publishing {
+  publications {
+    create<MavenPublication>("mavenJava") {
+      artifactId = "convert"
+      from(components["java"])
+
+      pom {
+        name.set(rootProject.name)
+        url.set("https://github.com/TehBrian/CTIF")
+      }
+    }
   }
 }
