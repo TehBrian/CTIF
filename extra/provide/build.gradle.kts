@@ -20,7 +20,7 @@ repositories {
 }
 
 dependencies {
-  implementation("pl.asie.ctif:ctif-convert:0.1.0")
+  implementation("pl.asie.ctif:ctif-convert:0.2.0")
   implementation("org.im4java:im4java:1.4.0")
   implementation("com.beust:jcommander:1.82")
   implementation("com.github.kokorin.jaffree:jaffree:2022.06.03")
