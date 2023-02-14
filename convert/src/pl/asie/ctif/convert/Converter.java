@@ -106,7 +106,15 @@ public class Converter {
 
   private void addQuantError(float[][] pixelArray, int x, int y, int w, int h, float[] expected, float[] received, float mul) {
     if (x >= 0 && y >= 0 && x < w && y < h) {
-      Utils.addQuantError(pixelArray[y * w + x], expected, received, mul);
+      addQuantError(pixelArray[y * w + x], expected, received, mul);
+    }
+  }
+
+  private static void addQuantError(float[] target, float[] expected, float[] received, float mul) {
+    if (mul != 0.0f) {
+      for (int i = 0; i < target.length; i++) {
+        target[i] += (expected[i] - received[i]) * mul;
+      }
     }
   }
 

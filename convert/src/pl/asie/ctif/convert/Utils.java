@@ -3,7 +3,6 @@ package pl.asie.ctif.convert;
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IMOperation;
 import org.im4java.core.Stream2BufferedImage;
-import pl.asie.ctif.convert.colorspace.Colorspace;
 
 import javax.imageio.ImageIO;
 import java.awt.Graphics2D;
@@ -12,11 +11,18 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-public final class Utils {
+public class Utils {
+
   private static int imMode = -1;
 
-  private Utils() {
+  public static int[] getRGB(BufferedImage image) {
+    return image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
+  }
 
+  public static double getColorDistanceSq(float[] f1, float[] f2) {
+    return (f1[0] - f2[0]) * (f1[0] - f2[0]) +
+        (f1[1] - f2[1]) * (f1[1] - f2[1]) +
+        (f1[2] - f2[2]) * (f1[2] - f2[2]);
   }
 
   private static ConvertCmd createConvertCmd() {
@@ -104,31 +110,5 @@ public final class Utils {
       e.printStackTrace();
       return null;
     }
-  }
-
-  public static int[] getRGB(BufferedImage image) {
-    return image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
-  }
-
-  public static void addQuantError(float[] target, float[] expected, float[] received, float mul) {
-    if (mul != 0.0f) {
-      for (int i = 0; i < target.length; i++) {
-        target[i] += (expected[i] - received[i]) * mul;
-      }
-    }
-  }
-
-  public static double getColorDistance(int c1, int c2, Colorspace colorspace) {
-    return Math.sqrt(getColorDistanceSq(c1, c2, colorspace));
-  }
-
-  public static double getColorDistanceSq(int c1, int c2, Colorspace colorspace) {
-    return getColorDistanceSq(colorspace.fromRGB(c1), colorspace.fromRGB(c2));
-  }
-
-  public static double getColorDistanceSq(float[] f1, float[] f2) {
-    return (f1[0] - f2[0]) * (f1[0] - f2[0]) +
-        (f1[1] - f2[1]) * (f1[1] - f2[1]) +
-        (f1[2] - f2[2]) * (f1[2] - f2[2]);
   }
 }
