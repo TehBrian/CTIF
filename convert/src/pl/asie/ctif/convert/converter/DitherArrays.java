@@ -1,4 +1,4 @@
-package pl.asie.ctif.convert;
+package pl.asie.ctif.convert.converter;
 
 import java.util.HashMap;
 import java.util.Map;

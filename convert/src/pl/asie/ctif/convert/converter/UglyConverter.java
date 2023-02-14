@@ -1,5 +1,6 @@
-package pl.asie.ctif.convert;
+package pl.asie.ctif.convert.converter;
 
+import pl.asie.ctif.convert.Util;
 import pl.asie.ctif.convert.colorspace.AbstractColorspace;
 import pl.asie.ctif.convert.platform.AbstractPlatform;
 import pl.asie.ctif.convert.platform.PlatformComputerCraft;
@@ -12,7 +13,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
 
-public class Converter {
+public class UglyConverter {
   public enum DitherMode {
     NONE,
     ERROR,
@@ -32,7 +33,7 @@ public class Converter {
   private final float[][] pal;
   private final int pw, ph, cw, ch;
 
-  public Converter(
+  public UglyConverter(
       BufferedImage image,
       Color[] palette,
       DitherMode ditherMode,

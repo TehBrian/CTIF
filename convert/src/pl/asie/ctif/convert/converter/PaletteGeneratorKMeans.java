@@ -1,5 +1,6 @@
-package pl.asie.ctif.convert;
+package pl.asie.ctif.convert.converter;
 
+import pl.asie.ctif.convert.Util;
 import pl.asie.ctif.convert.colorspace.AbstractColorspace;
 
 import java.awt.Color;

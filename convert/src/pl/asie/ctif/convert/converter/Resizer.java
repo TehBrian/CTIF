@@ -1,4 +1,4 @@
-package pl.asie.ctif.convert;
+package pl.asie.ctif.convert.converter;
 
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
