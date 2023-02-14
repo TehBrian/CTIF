@@ -21,26 +21,26 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ]]
 
-local pal = {"0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f"}
+local pal = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"}
 local oldCols = {}
 local colsChanged = false
 local ctable = {}
-local hdr = {67,84,73,70}
+local hdr = {67, 84, 73, 70}
 local args = {...}
 
 -- No Lua 5.3? Oh well.
-for a=0,1 do
-for b=0,1 do
-for c=0,1 do
-for d=0,1 do
-for e=0,1 do
-for f=0,1 do
-  ctable[1 + a*32 + b*16 + c*8 + d*4 + e*2 + f] = e*16 + d*8 + c*4 + b*2 + a
-end
-end
-end
-end
-end
+for a = 0, 1 do
+  for b = 0, 1 do
+    for c = 0, 1 do
+      for d = 0, 1 do
+        for e = 0, 1 do
+          for f = 0, 1 do
+            ctable[1 + a * 32 + b * 16 + c * 8 + d * 4 + e * 2 + f] = e * 16 + d * 8 + c * 4 + b * 2 + a
+          end
+        end
+      end
+    end
+  end
 end
 
 local file = fs.open(args[1], "rb")
@@ -57,7 +57,7 @@ function readShort()
 end
 
 -- Verify header
-for i=1,4 do
+for i = 1, 4 do
   if file.read() ~= hdr[i] then
     error("Invalid header!")
   end
@@ -93,11 +93,11 @@ if ccArraySize > 0 then
   if t.setPaletteColour == nil then
     error("Custom colors are not supported on this version of ComputerCraft! Please upgrade.")
   else
-    for i=0,ccArraySize-1 do
+    for i = 0, ccArraySize - 1 do
       local oldColR, oldColG, oldColB = t.getPaletteColour(bit.blshift(1, i))
-      oldCols[i*3 + 1] = oldColR
-      oldCols[i*3 + 2] = oldColG
-      oldCols[i*3 + 3] = oldColB
+      oldCols[i * 3 + 1] = oldColR
+      oldCols[i * 3 + 2] = oldColG
+      oldCols[i * 3 + 3] = oldColB
       local colB = file.read() / 255
       local colG = file.read() / 255
       local colR = file.read() / 255
@@ -116,7 +116,7 @@ local xoff = -1
 local yoff = -1
 local xbase, ybase = t.getSize()
 if isMonitor then
-  for xdiv=5,0.5,-0.5 do
+  for xdiv = 5, 0.5, -0.5 do
     local xsize = math.floor(xbase / (xdiv * 2))
     local ysize = math.floor(ybase / (xdiv * 2))
     if xsize >= width and ysize >= height then
@@ -138,39 +138,39 @@ if (xoff < 0) or (yoff < 0) then
 end
 
 -- Draw
-for y=0,height-1 do
-local bgs = ""
-local fgs = ""
-local chs = ""
-for x=0,width-1 do
-  if pw*ph == 1 then
-    bgs = bgs .. pal[1 + file.read()]
-    fgs = fgs .. "0"
-    chs = chs .. " "
-  else
-    local col = file.read()
-    local ch = file.read()
-    local fg = col % 16
-    local bg = (col - fg) / 16
-    if ch % 2 == 1 then
-      ch = 63 - ch
-      local t = fg
-      fg = bg
-      bg = t
+for y = 0, height - 1 do
+  local bgs = ""
+  local fgs = ""
+  local chs = ""
+  for x = 0, width - 1 do
+    if pw * ph == 1 then
+      bgs = bgs .. pal[1 + file.read()]
+      fgs = fgs .. "0"
+      chs = chs .. " "
+    else
+      local col = file.read()
+      local ch = file.read()
+      local fg = col % 16
+      local bg = (col - fg) / 16
+      if ch % 2 == 1 then
+        ch = 63 - ch
+        local t = fg
+        fg = bg
+        bg = t
+      end
+      bgs = bgs .. pal[1 + bg]
+      fgs = fgs .. pal[1 + fg]
+      chs = chs .. string.char(128 + ctable[1 + ch])
     end
-    bgs = bgs .. pal[1 + bg]
-    fgs = fgs .. pal[1 + fg]
-    chs = chs .. string.char(128 + ctable[1 + ch])
   end
-end
-t.setCursorPos(xoff, yoff + y)
-t.blit(chs, fgs, bgs)
+  t.setCursorPos(xoff, yoff + y)
+  t.blit(chs, fgs, bgs)
 end
 
 file.close()
 
 if colsChanged then
-  for i=0,ccArraySize-1 do
-    t.setPaletteColour(bit.blshift(1, i), oldCols[i*3 + 1], oldCols[i*3 + 2], oldCols[i*3 + 3])
+  for i = 0, ccArraySize - 1 do
+    t.setPaletteColour(bit.blshift(1, i), oldCols[i * 3 + 1], oldCols[i * 3 + 2], oldCols[i * 3 + 3])
   end
 end
