@@ -58,9 +58,25 @@ the width `*2` and the height `*4`.)
 
 The viewers' code can be found in the `view` directory. In it, there are three files.
 
-* `ctif-view-oc.lua` - CTIF viewer for OpenComputers. Usage: `ctif-view-oc <file>`. Requires the CPU's architecture to
+- `ctif-view-oc.lua` - CTIF viewer for OpenComputers. Usage: `ctif-view-oc <file>`. Requires the CPU's architecture to
   be set to **Lua 5.3**. (To change the architecture, shift-click the CPU while holding it.)
-* `ctif-view-cc.lua` - CTIF viewer for ComputerCraft 1.79-. Usage: `ctif-view-cc <file> [monitor side]`. If you see
+- `ctif-view-cc.lua` - CTIF viewer for ComputerCraft 1.79-. Usage: `ctif-view-cc <file> [monitor side]`. If you see
   errors about the image size being too large, keep in mind that the viewer operates on *characters* while the converter
   operates on *pixels*. To convert from characters to pixels, multiply the width by 2 and the height by 4.
-* `ctif-view-cc-1.8.lua` - CTIF viewer for ComputerCraft 1.80+.
+- `ctif-view-cc-1.8.lua` - CTIF viewer for ComputerCraft 1.80+.
+
+## Extra
+
+This repository also contains a few bonus projects located in the `extra` directory.
+These are **not** necessary to CTIF's functionality; however, you may find them useful. (That's why they're there! :D)
+
+Separated by directory, they are:
+
+- `slideshow` - For OpenComputers, this Lua program allows you to switch between multiple CTIF images located in
+  a folder with the arrow keys. Both Lua files are required. (`ctif-lib-oc.lua` is a slightly modified version of
+  `ctif-view-oc.lua` that exposes the viewing functionality as a Lua module.)
+- `ctif-provide` - A web server written in Java that converts any media to CTIF images on-demand. Requested URLs are
+  downloaded, converted to PNGs with FFmpeg, converted to CTIFs with `ctif-convert`, and sent back to the user. All of
+  this happens in-memory.
+- `ctif-grab` - A simple Lua utility that interfaces with a web server hosting `ctif-provide` to convert and download
+  external media files as CTIF images.
