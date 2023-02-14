@@ -1,10 +1,12 @@
+local server = "https://thbn.me/ctif-provide"
+
 local shell = require("shell")
 local os = require("os")
 
 local args = {...}
 
 if #args < 2 then
-  print("You must provide the source URL and the save location as arguments.")
+  print("Error: You must provide the source URL and the save location as arguments.")
   os.exit(1)
 end
 
@@ -19,8 +21,19 @@ if not hasSuffix then
   saveLoc = saveLoc .. ".ctif"
 end
 
-shell.execute("wget <server>?url=" .. url .. " " .. saveLoc)
+local view = false
+if #args > 2 and (args[3] == "view" or args[3] == "open") then
+  view = true
+end
 
-if #args > 2 and args[3] == "view" then
+print()
+print("Grabbing: " .. url)
+print("Saving at: " .. saveLoc)
+print("Will view: " .. tostring(view))
+print()
+
+shell.execute("wget " .. server .. "?url=" .. url .. " " .. saveLoc)
+
+if view then
   shell.execute("ctif-view-oc " .. saveLoc)
 end
