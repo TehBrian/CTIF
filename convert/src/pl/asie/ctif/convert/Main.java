@@ -88,6 +88,8 @@ public class Main {
   public static Colorspace COLORSPACE = null;
   public static Platform PLATFORM = null;
   public static int OPTIMIZATION_LEVEL = 1;
+  public static boolean DEBUG = false;
+
   private static final Map<String, float[]> DITHER_ARRAYS = new HashMap<>();
   private static final Map<String, Platform> PLATFORMS = new HashMap<>();
   private static final Map<String, Colorspace> COLORSPACES = new HashMap<>();
@@ -95,7 +97,7 @@ public class Main {
   static {
     PLATFORMS.put("cc", new PlatformComputerCraft(false));
     PLATFORMS.put("cc-paletted", new PlatformComputerCraft(true));
-//		PLATFORMS.put("oc-tier1", new PlatformOpenComputers(1));
+    PLATFORMS.put("oc-tier1", new PlatformOpenComputers(PlatformOpenComputers.Screen.TIER_1));
     PLATFORMS.put("oc-tier2", new PlatformOpenComputers(PlatformOpenComputers.Screen.TIER_2));
     PLATFORMS.put("oc-tier3", new PlatformOpenComputers(PlatformOpenComputers.Screen.TIER_3));
     PLATFORMS.put("zxspectrum", new PlatformZXSpectrum(0));
@@ -197,8 +199,6 @@ public class Main {
         4
     });
   }
-
-  public static boolean DEBUG = false;
 
   private static int rCeil(int x, int y) {
     if (x % y > 0) {
