@@ -2,6 +2,7 @@ package pl.asie.ctif.convert;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
+import org.jspecify.annotations.Nullable;
 import pl.asie.ctif.convert.colorspace.Colorspace;
 import pl.asie.ctif.convert.converter.FriendlyConverter;
 import pl.asie.ctif.convert.converter.Resizer;
@@ -129,7 +130,7 @@ public class Main {
     }
   }
 
-  public static BufferedImage loadImage(String location) {
+  public static @Nullable BufferedImage loadImage(String location) {
     try {
       if (location.equals("-")) {
         return ImageIO.read(System.in);

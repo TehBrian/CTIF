@@ -14,6 +14,7 @@ repositories {
 dependencies {
   implementation("org.im4java:im4java:1.4.0")
   implementation("com.beust:jcommander:1.82")
+  implementation("org.jspecify:jspecify:0.3.0")
 }
 
 java {
