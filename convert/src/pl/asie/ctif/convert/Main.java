@@ -295,9 +295,9 @@ public class Main {
     if (image.getWidth() == width && image.getHeight() == height) {
       resizedImage = image;
     } else if (resizeMode == ResizeMode.SPEED) {
-      resizedImage = Utils.resizeBox(image, width, height);
+      resizedImage = Util.resizeBox(image, width, height);
     } else {
-      resizedImage = Utils.resize(image, width, height, resizeMode == ResizeMode.QUALITY_NATIVE);
+      resizedImage = Util.resize(image, width, height, resizeMode == ResizeMode.QUALITY_NATIVE);
     }
 
     timeR = System.currentTimeMillis() - timeR;
@@ -392,7 +392,7 @@ public class Main {
       }
 
       if (previewFilename != null) {
-        Utils.saveImage(Utils.resizeBox(outputImage, width * 2, height * 2), new File(previewFilename).getAbsolutePath());
+        Util.saveImage(Util.resizeBox(outputImage, width * 2, height * 2), new File(previewFilename).getAbsolutePath());
       }
 
       return new Result(outputImage, outputData);
@@ -424,7 +424,7 @@ public class Main {
     }
 
     final String imagePath = params.files.get(0);
-    BufferedImage image = Utils.loadImage(imagePath);
+    BufferedImage image = Util.loadImage(imagePath);
     if (image == null) {
       System.err.printf("Could not load image: %s%n", imagePath);
       System.exit(1);
