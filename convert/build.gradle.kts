@@ -40,7 +40,7 @@ tasks {
 publishing {
   publications {
     create<MavenPublication>("mavenJava") {
-      artifactId = "convert"
+      artifactId = rootProject.name
       from(components["java"])
 
       pom {
