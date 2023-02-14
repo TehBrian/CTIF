@@ -1,7 +1,6 @@
 package dev.tehbrian.ctif.provide;
 
 public final class Main {
-
   private Main() {
   }
 
@@ -10,5 +9,4 @@ public final class Main {
     webService.start();
     Runtime.getRuntime().addShutdownHook(new Thread(webService::stop));
   }
-
 }

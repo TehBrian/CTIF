@@ -24,7 +24,6 @@ import java.net.http.HttpResponse;
  * Controls the web server.
  */
 public final class WebService {
-
   private static final Logger LOGGER = LogManager.getLogger();
 
   private @Nullable Javalin javalin;
@@ -47,7 +46,7 @@ public final class WebService {
   public void start() {
     this.javalin = Javalin.create();
 
-    this.javalin.get("/{target}", ctx -> {
+    this.javalin.get("/*", ctx -> {
       final var url = ctx.queryParam("url");
       if (url == null || url.isEmpty()) {
         ctx.result("You must provide a source URL as a query parameter with the key `url`.");
@@ -80,7 +79,7 @@ public final class WebService {
           .addArguments("-c", "png")
           .execute();
 
-      Main.Result result = Main.convertImage(
+      final Main.Result result = Main.convertImage(
           new PlatformOpenComputers(PlatformOpenComputers.Screen.TIER_3),
           Colorspace.YIQ,
           1,
@@ -119,5 +118,4 @@ public final class WebService {
       this.javalin.stop();
     }
   }
-
 }
