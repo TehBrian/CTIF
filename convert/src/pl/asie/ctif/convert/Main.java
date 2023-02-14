@@ -88,11 +88,6 @@ public class Main {
     QUALITY
   }
 
-  public static AbstractColorspace COLORSPACE = null;
-  public static AbstractPlatform PLATFORM = null;
-  public static int OPTIMIZATION_LEVEL = 1;
-  public static boolean DEBUG = false;
-
   private static final Map<String, float[]> DITHER_ARRAYS = new HashMap<>();
 
   static {
@@ -219,12 +214,7 @@ public class Main {
       Converter.DitherMode ditherMode,
       final String previewFilename
   ) {
-    PLATFORM = platform;
-    COLORSPACE = colorspace;
-    OPTIMIZATION_LEVEL = optimizationLevel;
-    DEBUG = debug;
-
-    Color[] platformPalette = PLATFORM.getPalette();
+    Color[] platformPalette = platform.getPalette();
 
     // adjusting dither type.
     if (ditherType == null) {
@@ -236,12 +226,12 @@ public class Main {
     }
 
     // if width/height was set, max at platform char width/height.
-    w = (w > 0) ? rCeil(w, PLATFORM.getCharWidth()) : 0;
-    h = (h > 0) ? rCeil(h, PLATFORM.getCharHeight()) : 0;
+    w = (w > 0) ? rCeil(w, platform.getCharWidth()) : 0;
+    h = (h > 0) ? rCeil(h, platform.getCharHeight()) : 0;
 
     // default to platform width/height.
-    if (w == 0) w = PLATFORM.getWidthPx();
-    if (h == 0) h = PLATFORM.getHeightPx();
+    if (w == 0) w = platform.getWidthPx();
+    if (h == 0) h = platform.getHeightPx();
 
     if (!ignoreAspectRatio) {
       float x = (float) image.getWidth() / image.getHeight();
@@ -250,26 +240,26 @@ public class Main {
               (float) w / x,
               (float) h / y
           ),
-          (float) Math.sqrt((float) PLATFORM.getCharsPx() / (x * y)));
-      w = rCeil((int) Math.floor(x * a), PLATFORM.getCharWidth());
-      h = rCeil((int) Math.floor(y * a), PLATFORM.getCharHeight());
+          (float) Math.sqrt((float) platform.getCharsPx() / (x * y)));
+      w = rCeil((int) Math.floor(x * a), platform.getCharWidth());
+      h = rCeil((int) Math.floor(y * a), platform.getCharHeight());
     }
 
-    if (w * h > PLATFORM.getCharsPx()) {
-      System.err.printf("Size too large: %dx%d (maximum size: %d pixels)%n", w, h, PLATFORM.getCharsPx());
+    if (w * h > platform.getCharsPx()) {
+      System.err.printf("Size too large: %dx%d (maximum size: %d pixels)%n", w, h, platform.getCharsPx());
       System.exit(1);
-    } else if (w > PLATFORM.getWidthPx()) {
-      System.err.printf("Width too large: %d (maximum width: %d)%n", w, PLATFORM.getWidthPx());
+    } else if (w > platform.getWidthPx()) {
+      System.err.printf("Width too large: %d (maximum width: %d)%n", w, platform.getWidthPx());
       System.exit(1);
-    } else if (h > PLATFORM.getHeightPx()) {
-      System.err.printf("Height too large: %d (maximum height: %d)%n", h, PLATFORM.getHeightPx());
+    } else if (h > platform.getHeightPx()) {
+      System.err.printf("Height too large: %d (maximum height: %d)%n", h, platform.getHeightPx());
       System.exit(1);
     }
 
     int width = w;
     int height = h;
 
-    if (Main.DEBUG) {
+    if (debug) {
       System.out.println("Using " + threads + " threads.");
     }
 
@@ -286,16 +276,16 @@ public class Main {
     }
 
     timeR = System.currentTimeMillis() - timeR;
-    if (DEBUG) {
+    if (debug) {
       System.out.println("Image resize time: " + timeR + " ms");
     }
 
-    if (PLATFORM.getCustomColorCount() > 0) {
+    if (platform.getCustomColorCount() > 0) {
       if (palette != null) {
         System.out.println("Reading palette...");
         try {
           FileInputStream inputStream = new FileInputStream(palette);
-          for (int i = 0; i < PLATFORM.getCustomColorCount(); i++) {
+          for (int i = 0; i < platform.getCustomColorCount(); i++) {
             int red = inputStream.read();
             int green = inputStream.read();
             int blue = inputStream.read();
@@ -308,10 +298,10 @@ public class Main {
       } else {
         long time = System.currentTimeMillis();
         System.out.println("Generating palette...");
-        PaletteGeneratorKMeans generator = new PaletteGeneratorKMeans(resizedImage, platformPalette, PLATFORM.getCustomColorCount(), paletteSamplingResolution);
+        PaletteGeneratorKMeans generator = new PaletteGeneratorKMeans(resizedImage, platformPalette, platform.getCustomColorCount(), paletteSamplingResolution, colorspace, optimizationLevel, debug);
         platformPalette = generator.generate(threads);
         time = System.currentTimeMillis() - time;
-        if (DEBUG) {
+        if (debug) {
           System.out.println("Palette generation time: " + time + " ms");
         }
       }
@@ -362,17 +352,20 @@ public class Main {
       long time = System.currentTimeMillis();
 
       Converter writer = new Converter(
-          platformPalette,
           resizedImage,
+          platformPalette,
           ditherMode,
-          ditherArray
+          ditherArray,
+          platform,
+          colorspace,
+          optimizationLevel
       );
 
       ByteArrayOutputStream outputData = new ByteArrayOutputStream();
       BufferedImage outputImage = writer.write(outputData);
 
       time = System.currentTimeMillis() - time;
-      if (DEBUG) {
+      if (debug) {
         System.out.println("Image conversion time: " + time + " ms");
       }
 

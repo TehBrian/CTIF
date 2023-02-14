@@ -1,5 +1,7 @@
 package pl.asie.ctif.convert;
 
+import pl.asie.ctif.convert.colorspace.AbstractColorspace;
+
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
@@ -23,6 +25,10 @@ public class PaletteGeneratorKMeans {
     }
   }
 
+  private final AbstractColorspace colorspace;
+  private final int optimizationLevel;
+  private final boolean debug;
+
   private final int colors;
   private final BufferedImage image;
   private final Color[] base;
@@ -32,7 +38,11 @@ public class PaletteGeneratorKMeans {
   private final Map<float[], Double> knownBestError = new HashMap<>();
   private final Map<float[], Integer> knownBestCentroid = new HashMap<>();
 
-  public PaletteGeneratorKMeans(BufferedImage image, Color[] base, int colors, int samplingRes) {
+  public PaletteGeneratorKMeans(BufferedImage image, Color[] base, int colors, int samplingRes, AbstractColorspace colorspace, int optimizationLevel, boolean debug) {
+    this.colorspace = colorspace;
+    this.optimizationLevel = optimizationLevel;
+    this.debug = debug;
+
     this.colors = colors;
     this.image = image;
     this.base = base;
@@ -49,7 +59,7 @@ public class PaletteGeneratorKMeans {
         for (int jx = 0; jx < maximum * 2; jx++) {
           int i = image.getRGB(random.nextInt(stepIX) + (int) ((jx % maximum) * stepX), random.nextInt(stepIY) + (int) (jy * stepY));
           if (!pointsAdded.containsKey(i)) {
-            float[] key = Main.COLORSPACE.fromRGB(i);
+            float[] key = this.colorspace.fromRGB(i);
             pointsAdded.put(i, key);
             pointsWeight.put(key, 1);
           } else {
@@ -58,7 +68,7 @@ public class PaletteGeneratorKMeans {
         }
       }
     } else {
-      if (Main.OPTIMIZATION_LEVEL >= 3 && (image.getWidth() * image.getHeight() >= 4096)) {
+      if (this.optimizationLevel >= 3 && (image.getWidth() * image.getHeight() >= 4096)) {
         for (int jy = 0; jy < image.getHeight(); jy += 4) {
           int my = Math.min(4, image.getHeight() - jy);
           for (int jx = 0; jx < image.getWidth(); jx += 4) {
@@ -66,7 +76,7 @@ public class PaletteGeneratorKMeans {
 
             int i = image.getRGB(random.nextInt(mx) + jx, random.nextInt(my) + jy);
             if (!pointsAdded.containsKey(i)) {
-              float[] key = Main.COLORSPACE.fromRGB(i);
+              float[] key = this.colorspace.fromRGB(i);
               pointsAdded.put(i, key);
               pointsWeight.put(key, 1);
             } else {
@@ -77,7 +87,7 @@ public class PaletteGeneratorKMeans {
       } else {
         for (int i : Util.getRGB(image)) {
           if (!pointsAdded.containsKey(i)) {
-            float[] key = Main.COLORSPACE.fromRGB(i);
+            float[] key = this.colorspace.fromRGB(i);
             pointsAdded.put(i, key);
             pointsWeight.put(key, 1);
           } else {
@@ -88,7 +98,7 @@ public class PaletteGeneratorKMeans {
     }
 
     for (int i = colors; i < centroids.length; i++) {
-      centroids[i] = Main.COLORSPACE.fromRGB(base[i].getRGB());
+      centroids[i] = this.colorspace.fromRGB(base[i].getRGB());
     }
 
     for (Map.Entry<float[], Integer> weight : pointsWeight.entrySet()) {
@@ -109,7 +119,7 @@ public class PaletteGeneratorKMeans {
 
   public Color[] generate(int threads) {
     Result bestResult = null;
-    Worker[] workers = new Worker[20 / (Main.OPTIMIZATION_LEVEL + 1)];
+    Worker[] workers = new Worker[20 / (this.optimizationLevel + 1)];
     ExecutorService executorService = Executors.newFixedThreadPool(threads);
 
     for (int i = 0; i < workers.length; i++) {
@@ -126,7 +136,7 @@ public class PaletteGeneratorKMeans {
 
     for (int i = 0; i < workers.length; i++) {
       Result result = workers[i].result;
-      if (Main.DEBUG) {
+      if (debug) {
         System.err.println("Palette generator worker #" + (i + 1) + " error = " + result.error);
       }
       if (bestResult == null || bestResult.error > result.error) {
@@ -134,7 +144,7 @@ public class PaletteGeneratorKMeans {
       }
     }
 
-    if (Main.DEBUG) {
+    if (debug) {
       System.err.println("Palette generator error = " + bestResult.error);
     }
 
@@ -143,7 +153,7 @@ public class PaletteGeneratorKMeans {
 
   private Result generateKMeans() {
     for (int i = 0; i < colors; i++) {
-      centroids[i] = Main.COLORSPACE.fromRGB(image.getRGB(random.nextInt(image.getWidth()), random.nextInt(image.getHeight())));
+      centroids[i] = this.colorspace.fromRGB(image.getRGB(random.nextInt(image.getWidth()), random.nextInt(image.getHeight())));
     }
 
     double totalError = 0;
@@ -195,7 +205,7 @@ public class PaletteGeneratorKMeans {
 
     Color[] out = Arrays.copyOf(base, base.length);
     for (int k = 0; k < colors; k++) {
-      out[k] = new Color(Main.COLORSPACE.toRGB(centroids[k]) | 0xFF000000);
+      out[k] = new Color(this.colorspace.toRGB(centroids[k]) | 0xFF000000);
     }
     return new Result(out, totalError);
   }

@@ -1,5 +1,7 @@
 package pl.asie.ctif.convert;
 
+import pl.asie.ctif.convert.colorspace.AbstractColorspace;
+import pl.asie.ctif.convert.platform.AbstractPlatform;
 import pl.asie.ctif.convert.platform.PlatformComputerCraft;
 import pl.asie.ctif.convert.platform.PlatformOpenComputers;
 import pl.asie.ctif.convert.platform.PlatformZXSpectrum;
@@ -17,21 +19,36 @@ public class Converter {
     ORDERED
   }
 
-  private final Color[] palette;
   private final BufferedImage image;
+  private final Color[] palette;
   private final DitherMode ditherMode;
   private final float[] ditherMatrix;
-  private final int ditherMatrixSize, ditherMatrixOffset;
+  private final AbstractPlatform platform;
+  private final AbstractColorspace colorspace;
+  private final int optimizationLevel;
+
+  private final int ditherMatrixSize, ditherMatrixOffset, ditherMax;
   private final float[][] img;
   private final float[][] pal;
-  private final int cw, ch, pw, ph;
-  private final int ditherMax;
+  private final int pw, ph, cw, ch;
 
-  public Converter(Color[] colors, BufferedImage image, DitherMode ditherMode, float[] ditherMatrix) {
-    int i;
-
+  public Converter(
+      BufferedImage image,
+      Color[] palette,
+      DitherMode ditherMode,
+      float[] ditherMatrix,
+      AbstractPlatform platform,
+      AbstractColorspace colorspace,
+      int optimizationLevel
+  ) {
+    this.image = image;
+    this.palette = palette;
     this.ditherMode = ditherMode;
     this.ditherMatrix = ditherMatrix;
+    this.platform = platform;
+    this.colorspace = colorspace;
+    this.optimizationLevel = optimizationLevel;
+
     if (ditherMode == DitherMode.ORDERED) {
       assert ditherMatrix != null;
       this.ditherMatrixSize = (int) Math.sqrt(ditherMatrix.length - 1);
@@ -43,23 +60,20 @@ public class Converter {
       this.ditherMax = 0;
     }
 
-    this.image = image;
-    this.palette = colors;
-
     this.img = new float[image.getWidth() * image.getHeight()][3];
-    this.pal = new float[colors.length][3];
+    this.pal = new float[palette.length][3];
 
-    this.pw = Main.PLATFORM.getCharWidth();
-    this.ph = Main.PLATFORM.getCharHeight();
+    this.pw = this.platform.getCharWidth();
+    this.ph = this.platform.getCharHeight();
     this.cw = image.getWidth() / pw;
     this.ch = image.getHeight() / ph;
 
-    for (i = 0; i < img.length; i++) {
-      img[i] = Main.COLORSPACE.fromRGB(image.getRGB(i % image.getWidth(), i / image.getWidth()));
+    for (int i = 0; i < img.length; i++) {
+      img[i] = this.colorspace.fromRGB(image.getRGB(i % image.getWidth(), i / image.getWidth()));
     }
 
-    for (i = 0; i < colors.length; i++) {
-      pal[i] = Main.COLORSPACE.fromRGB(colors[i].getRGB());
+    for (int i = 0; i < palette.length; i++) {
+      pal[i] = this.colorspace.fromRGB(palette[i].getRGB());
     }
   }
 
@@ -73,8 +87,8 @@ public class Converter {
 
     stream.write(1); // Header version
     stream.write(0); // Platform variant (0 - default)
-    stream.write(Main.PLATFORM.getPlatformId());
-    stream.write(Main.PLATFORM.getPlatformId() >> 8); // Platform ID
+    stream.write(this.platform.getPlatformId());
+    stream.write(this.platform.getPlatformId() >> 8); // Platform ID
     stream.write(cw & 0xFF);
     stream.write(cw >> 8); // Width in chars
     stream.write(ch & 0xFF);
@@ -84,7 +98,7 @@ public class Converter {
 
     stream.write(palette.length > 16 ? 8 : 4); // BPP (byte)
 
-    if (Main.PLATFORM.getCustomColorCount() > 0) {
+    if (this.platform.getCustomColorCount() > 0) {
       stream.write(3); // Palette entry size
       stream.write(16);
       stream.write(0); // Palette array size
@@ -133,17 +147,17 @@ public class Converter {
 
     float[] colA = new float[3];
 
-    boolean usePalMap = Main.OPTIMIZATION_LEVEL > 0
-        && Main.PLATFORM instanceof PlatformOpenComputers
-        && ((PlatformOpenComputers) Main.PLATFORM).getScreen() == PlatformOpenComputers.Screen.TIER_3;
+    boolean usePalMap = this.optimizationLevel > 0
+        && this.platform instanceof PlatformOpenComputers
+        && ((PlatformOpenComputers) this.platform).getScreen() == PlatformOpenComputers.Screen.TIER_3;
 
     int[] palMap = new int[palette.length];
     int palMapLength;
     for (int i = 0; i < 16; i++)
       palMap[i] = i;
-    int t3OffRed = Main.OPTIMIZATION_LEVEL <= 1 ? 3 : (Main.OPTIMIZATION_LEVEL == 2 ? 2 : 1);
-    int t3OffGreen = Main.OPTIMIZATION_LEVEL <= 1 ? 3 : (Main.OPTIMIZATION_LEVEL <= 3 ? 2 : 1);
-    int t3OffBlue = Main.OPTIMIZATION_LEVEL <= 1 ? 2 : 1;
+    int t3OffRed = this.optimizationLevel <= 1 ? 3 : (this.optimizationLevel == 2 ? 2 : 1);
+    int t3OffGreen = this.optimizationLevel <= 1 ? 3 : (this.optimizationLevel <= 3 ? 2 : 1);
+    int t3OffBlue = this.optimizationLevel <= 1 ? 2 : 1;
 
     for (int cy = 0; cy < ch; cy++) {
       for (int cx = 0; cx < cw; cx++) {
@@ -183,7 +197,7 @@ public class Converter {
 
         boolean bcqFound = false;
 
-        if (ditherMode == DitherMode.NONE && Main.OPTIMIZATION_LEVEL >= 3) {
+        if (ditherMode == DitherMode.NONE && this.optimizationLevel >= 3) {
           int[] colors = new int[pixels.length];
           int colorCount = 0;
           boolean[] uColors = new boolean[palette.length];
@@ -233,7 +247,7 @@ public class Converter {
             int ci1 = usePalMap ? palMap[cim1] : cim1;
             float[] col1 = pal[ci1];
 
-            for (int cim2 = (Main.PLATFORM instanceof PlatformZXSpectrum) ? (cim1 >= 8 ? 8 : 0) : 0; cim2 < cim1; cim2++) {
+            for (int cim2 = (this.platform instanceof PlatformZXSpectrum) ? (cim1 >= 8 ? 8 : 0) : 0; cim2 < cim1; cim2++) {
               if (bcerr == 0) break;
               int ci2 = usePalMap ? palMap[cim2] : cim2;
               float[] col2 = pal[ci2];
@@ -379,14 +393,14 @@ public class Converter {
           for (int i = 0; i < quadrantLen; i++) quadrant[i] = 0;
         }
 
-        if (Main.PLATFORM instanceof PlatformComputerCraft) {
+        if (this.platform instanceof PlatformComputerCraft) {
           if ((quadrant[0] & 0x01) != 0) {
             int t = fgIndex;
             fgIndex = bgIndex;
             bgIndex = t;
             quadrant[0] ^= 0x3F;
           }
-        } else if (Main.PLATFORM instanceof PlatformOpenComputers && pw * ph > 2) {
+        } else if (this.platform instanceof PlatformOpenComputers && pw * ph > 2) {
           if (bgIndex > fgIndex) {
             int t = fgIndex;
             fgIndex = bgIndex;
