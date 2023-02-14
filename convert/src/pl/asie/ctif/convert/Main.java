@@ -10,9 +10,13 @@ import pl.asie.ctif.convert.platform.PlatformZXSpectrum;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -208,79 +212,80 @@ public class Main {
     }
   }
 
-  public static void main(String[] args) {
-    Parameters params = new Parameters();
-    JCommander jCommander = new JCommander(params);
-    jCommander.parse(args);
+  public record Result(BufferedImage image, ByteArrayOutputStream data) {
+  }
 
-    if (params.help) {
-      jCommander.usage();
-      System.exit(0);
-    }
+  public static Result convertImage(
+      final Platform platform,
+      final Colorspace colorspace,
+      final int optimizationLevel,
+      final boolean debug,
+      final BufferedImage image,
+      int w,
+      int h,
+      final boolean ignoreAspectRatio,
+      final int threads,
+      final ResizeMode resizeMode,
+      final String palette,
+      final int paletteSamplingResolution,
+      final String paletteExport,
+      String ditherType,
+      final Float ditherLevel,
+      Converter.DitherMode ditherMode,
+      final String previewFilename
+  ) {
+    PLATFORM = platform;
+    COLORSPACE = colorspace;
+    OPTIMIZATION_LEVEL = optimizationLevel;
+    DEBUG = debug;
 
-    PLATFORM = PLATFORMS.get(params.mode.toLowerCase());
-    COLORSPACE = COLORSPACES.get(params.colorspace.toLowerCase());
+    Color[] platformPalette = PLATFORM.getPalette();
 
-    if (params.files.size() == 0) {
-      System.err.println("No input file specified!");
-      System.exit(1);
-    }
-
-    if (PLATFORM == null) {
-      System.err.printf("Invalid mode: %s%n", params.mode);
-      System.exit(1);
-    }
-
-    OPTIMIZATION_LEVEL = params.optimizationLevel;
-    DEBUG = params.debug;
-    if (params.ditherType == null) {
-      if (params.ditherMode == Converter.DitherMode.ORDERED) {
-        params.ditherType = "4x4";
+    // adjusting dither type.
+    if (ditherType == null) {
+      if (ditherMode == Converter.DitherMode.ORDERED) {
+        ditherType = "4x4";
       } else {
-        params.ditherType = "floyd-steinberg";
+        ditherType = "floyd-steinberg";
       }
     }
 
-    BufferedImage image = Utils.loadImage(params.files.get(0));
-    if (image == null) {
-      System.err.printf("Could not load image: %s%n", params.files.get(0));
-      System.exit(1);
-    }
+    // if width/height was set, max at platform char width/height.
+    w = (w > 0) ? rCeil(w, PLATFORM.getCharWidth()) : 0;
+    h = (h > 0) ? rCeil(h, PLATFORM.getCharHeight()) : 0;
 
-    Color[] palette = PLATFORM.getPalette();
-    params.w = (params.w > 0) ? rCeil(params.w, PLATFORM.getCharWidth()) : 0;
-    params.h = (params.h > 0) ? rCeil(params.h, PLATFORM.getCharHeight()) : 0;
+    // default to platform width/height.
+    if (w == 0) w = PLATFORM.getWidthPx();
+    if (h == 0) h = PLATFORM.getHeightPx();
 
-    if (params.w == 0) params.w = PLATFORM.getWidthPx();
-    if (params.h == 0) params.h = PLATFORM.getHeightPx();
-
-    if (!params.ignoreAspectRatio) {
-      float x = (params.ignoreAspectRatio ? PLATFORM.getDefaultAspectRatio() : (float) image.getWidth() / image.getHeight());
+    if (!ignoreAspectRatio) {
+      float x = (float) image.getWidth() / image.getHeight();
       float y = 1.0f;
       float a = Math.min(Math.min(
-              (float) params.w / x,
-              (float) params.h / y),
+              (float) w / x,
+              (float) h / y
+          ),
           (float) Math.sqrt((float) PLATFORM.getCharsPx() / (x * y)));
-      params.w = rCeil((int) Math.floor(x * a), PLATFORM.getCharWidth());
-      params.h = rCeil((int) Math.floor(y * a), PLATFORM.getCharHeight());
+      w = rCeil((int) Math.floor(x * a), PLATFORM.getCharWidth());
+      h = rCeil((int) Math.floor(y * a), PLATFORM.getCharHeight());
     }
 
-    if (params.w * params.h > PLATFORM.getCharsPx()) {
-      System.err.printf("Size too large: %dx%d (maximum size: %d pixels)%n", params.w, params.h, PLATFORM.getCharsPx());
+    if (w * h > PLATFORM.getCharsPx()) {
+      System.err.printf("Size too large: %dx%d (maximum size: %d pixels)%n", w, h, PLATFORM.getCharsPx());
       System.exit(1);
-    } else if (params.w > PLATFORM.getWidthPx()) {
-      System.err.printf("Width too large: %d (maximum width: %d)%n", params.w, PLATFORM.getWidthPx());
+    } else if (w > PLATFORM.getWidthPx()) {
+      System.err.printf("Width too large: %d (maximum width: %d)%n", w, PLATFORM.getWidthPx());
       System.exit(1);
-    } else if (params.h > PLATFORM.getHeightPx()) {
-      System.err.printf("Height too large: %d (maximum height: %d)%n", params.h, PLATFORM.getHeightPx());
+    } else if (h > PLATFORM.getHeightPx()) {
+      System.err.printf("Height too large: %d (maximum height: %d)%n", h, PLATFORM.getHeightPx());
       System.exit(1);
     }
 
-    int width = params.w;
-    int height = params.h;
+    int width = w;
+    int height = h;
 
     if (Main.DEBUG) {
-      System.out.println("Using " + params.threads + " threads.");
+      System.out.println("Using " + threads + " threads.");
     }
 
     System.out.println("Resizing image...");
@@ -289,10 +294,10 @@ public class Main {
     BufferedImage resizedImage;
     if (image.getWidth() == width && image.getHeight() == height) {
       resizedImage = image;
-    } else if (params.resizeMode == ResizeMode.SPEED) {
+    } else if (resizeMode == ResizeMode.SPEED) {
       resizedImage = Utils.resizeBox(image, width, height);
     } else {
-      resizedImage = Utils.resize(image, width, height, params.resizeMode == ResizeMode.QUALITY_NATIVE);
+      resizedImage = Utils.resize(image, width, height, resizeMode == ResizeMode.QUALITY_NATIVE);
     }
 
     timeR = System.currentTimeMillis() - timeR;
@@ -301,15 +306,15 @@ public class Main {
     }
 
     if (PLATFORM.getCustomColorCount() > 0) {
-      if (params.palette != null) {
+      if (palette != null) {
         System.out.println("Reading palette...");
         try {
-          FileInputStream inputStream = new FileInputStream(params.palette);
+          FileInputStream inputStream = new FileInputStream(palette);
           for (int i = 0; i < PLATFORM.getCustomColorCount(); i++) {
             int red = inputStream.read();
             int green = inputStream.read();
             int blue = inputStream.read();
-            palette[i] = new Color(red, green, blue);
+            platformPalette[i] = new Color(red, green, blue);
           }
           inputStream.close();
         } catch (Exception e) {
@@ -318,19 +323,19 @@ public class Main {
       } else {
         long time = System.currentTimeMillis();
         System.out.println("Generating palette...");
-        PaletteGeneratorKMeans generator = new PaletteGeneratorKMeans(resizedImage, palette, PLATFORM.getCustomColorCount(), params.paletteSamplingResolution);
-        palette = generator.generate(params.threads);
+        PaletteGeneratorKMeans generator = new PaletteGeneratorKMeans(resizedImage, platformPalette, PLATFORM.getCustomColorCount(), paletteSamplingResolution);
+        platformPalette = generator.generate(threads);
         time = System.currentTimeMillis() - time;
         if (DEBUG) {
           System.out.println("Palette generation time: " + time + " ms");
         }
       }
 
-      if (params.paletteExport != null) {
+      if (paletteExport != null) {
         System.out.println("Saving palette...");
         try {
-          FileOutputStream outputStream = new FileOutputStream(params.paletteExport);
-          for (final Color color : palette) {
+          FileOutputStream outputStream = new FileOutputStream(paletteExport);
+          for (final Color color : platformPalette) {
             outputStream.write(color.getRed());
             outputStream.write(color.getGreen());
             outputStream.write(color.getBlue());
@@ -342,55 +347,113 @@ public class Main {
       }
     }
 
-    try {
-      BufferedImage outputImage = resizedImage;
-      float[] ditherArray = DITHER_ARRAYS.get(params.ditherType.toLowerCase());
+    float[] ditherArray = DITHER_ARRAYS.get(ditherType.toLowerCase());
+    if (ditherLevel == 0) {
+      ditherMode = Converter.DitherMode.NONE;
+    } else if (ditherLevel != 1) {
+      ditherArray = Arrays.copyOf(ditherArray, ditherArray.length);
 
-      if (params.ditherLevel == 0) {
-        params.ditherMode = Converter.DitherMode.NONE;
-      } else if (params.ditherLevel != 1) {
-        ditherArray = Arrays.copyOf(ditherArray, ditherArray.length);
-
-        switch (params.ditherMode) {
-          case ERROR:
-            for (int i = 0; i < ditherArray.length; i++) {
-              ditherArray[i] *= params.ditherLevel;
+      switch (ditherMode) {
+        case ERROR:
+          for (int i = 0; i < ditherArray.length; i++) {
+            ditherArray[i] *= ditherLevel;
+          }
+          break;
+        case ORDERED:
+          float newScale = ditherLevel;
+          float newOffset = ditherArray.length * ((1 - ditherLevel) / 2.0f);
+          for (int i = 0; i < ditherArray.length; i++) {
+            if (ditherArray[i] > 0) {
+              ditherArray[i] = (ditherArray[i] - 1) * newScale + newOffset;
             }
-            break;
-          case ORDERED:
-            float newScale = params.ditherLevel;
-            float newOffset = ditherArray.length * ((1 - params.ditherLevel) / 2.0f);
-            for (int i = 0; i < ditherArray.length; i++) {
-              if (ditherArray[i] > 0) {
-                ditherArray[i] = (ditherArray[i] - 1) * newScale + newOffset;
-              }
-            }
-            break;
-        }
+          }
+          break;
       }
+    }
 
+    try {
       System.out.println("Converting image...");
 
       long time = System.currentTimeMillis();
-      Converter writer = new Converter(palette, resizedImage,
-          params.ditherMode,
+
+      Converter writer = new Converter(
+          platformPalette,
+          resizedImage,
+          ditherMode,
           ditherArray
       );
 
-      try {
-        outputImage = writer.write(new FileOutputStream(params.outputFilename != null ? params.outputFilename : params.files.get(0) + ".ctif"));
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
+      ByteArrayOutputStream outputData = new ByteArrayOutputStream();
+      BufferedImage outputImage = writer.write(outputData);
+
       time = System.currentTimeMillis() - time;
       if (DEBUG) {
         System.out.println("Image conversion time: " + time + " ms");
       }
 
-      if (params.previewFilename != null) {
-        Utils.saveImage(Utils.resizeBox(outputImage, width * 2, height * 2), new File(params.previewFilename).getAbsolutePath());
+      if (previewFilename != null) {
+        Utils.saveImage(Utils.resizeBox(outputImage, width * 2, height * 2), new File(previewFilename).getAbsolutePath());
       }
+
+      return new Result(outputImage, outputData);
     } catch (Exception e) {
+      e.printStackTrace();
+      return new Result(null, null);
+    }
+  }
+
+  public static void main(String[] args) {
+    Parameters params = new Parameters();
+    JCommander jCommander = new JCommander(params);
+    jCommander.parse(args);
+
+    if (params.help) {
+      jCommander.usage();
+      System.exit(0);
+    }
+
+    Platform platform = PLATFORMS.get(params.mode.toLowerCase());
+    if (PLATFORM == null) {
+      System.err.printf("Invalid mode: %s%n", params.mode);
+      System.exit(1);
+    }
+
+    if (params.files.size() == 0) {
+      System.err.println("No input file specified!");
+      System.exit(1);
+    }
+
+    final String imagePath = params.files.get(0);
+    BufferedImage image = Utils.loadImage(imagePath);
+    if (image == null) {
+      System.err.printf("Could not load image: %s%n", imagePath);
+      System.exit(1);
+    }
+
+    Result result = convertImage(
+        platform,
+        COLORSPACES.get(params.colorspace.toLowerCase()),
+        params.optimizationLevel,
+        params.debug,
+        image,
+        params.w,
+        params.h,
+        params.ignoreAspectRatio,
+        params.threads,
+        params.resizeMode,
+        params.palette,
+        params.paletteSamplingResolution,
+        params.paletteExport,
+        params.ditherType,
+        params.ditherLevel,
+        params.ditherMode,
+        params.previewFilename
+    );
+
+    String outputFilename = params.outputFilename != null ? params.outputFilename : params.files.get(0) + ".ctif";
+    try {
+      Files.write(Path.of(outputFilename), result.data().toByteArray());
+    } catch (IOException e) {
       e.printStackTrace();
     }
   }
