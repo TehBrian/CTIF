@@ -8,7 +8,7 @@ java {
 }
 
 application {
-  mainClass.set("dev.tehbrian.ctif.converter.Main")
+  mainClass.set("dev.tehbrian.ctif.provide.Main")
 }
 
 repositories {
