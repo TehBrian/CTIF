@@ -2,7 +2,7 @@ package pl.asie.ctif.convert.platform;
 
 import java.awt.Color;
 
-public class PlatformZXSpectrum extends Platform {
+public class PlatformZXSpectrum extends AbstractPlatform {
   private final int paletteMode;
 
   public PlatformZXSpectrum(int paletteMode) {

@@ -32,7 +32,6 @@ public class Util {
 
       try {
         cmd.setOutputConsumer(inputStream -> {
-
         });
         cmd.run(new IMOperation());
       } catch (Exception e) {

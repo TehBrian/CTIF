@@ -2,11 +2,10 @@ package pl.asie.ctif.convert;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
+import pl.asie.ctif.convert.colorspace.AbstractColorspace;
 import pl.asie.ctif.convert.colorspace.Colorspace;
+import pl.asie.ctif.convert.platform.AbstractPlatform;
 import pl.asie.ctif.convert.platform.Platform;
-import pl.asie.ctif.convert.platform.PlatformComputerCraft;
-import pl.asie.ctif.convert.platform.PlatformOpenComputers;
-import pl.asie.ctif.convert.platform.PlatformZXSpectrum;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -38,13 +37,13 @@ public class Main {
     private String palette;
 
     @Parameter(names = {"-m", "--mode"}, description = "Target platform (cc, cc-paletted, oc-tier2, oc-tier3)")
-    private String mode = "oc-tier3";
+    private Platform mode = Platform.OC_TIER_3;
 
     @Parameter(names = {"-O", "--optimization-level"}, description = "Optimization level [primarily 0-4]. Larger levels = less accurate but faster generated images. Default is 1.")
     private int optimizationLevel = 1;
 
     @Parameter(names = {"--colorspace"}, description = "Colorspace (rgb, yuv, yiq)")
-    private String colorspace = "yiq";
+    private Colorspace colorspace = Colorspace.YIQ;
 
     @Parameter(names = {"--dither-mode"}, description = "Dither mode (none, error, ordered)")
     private Converter.DitherMode ditherMode = Converter.DitherMode.ERROR;
@@ -89,28 +88,14 @@ public class Main {
     QUALITY
   }
 
-  public static Colorspace COLORSPACE = null;
-  public static Platform PLATFORM = null;
+  public static AbstractColorspace COLORSPACE = null;
+  public static AbstractPlatform PLATFORM = null;
   public static int OPTIMIZATION_LEVEL = 1;
   public static boolean DEBUG = false;
 
   private static final Map<String, float[]> DITHER_ARRAYS = new HashMap<>();
-  private static final Map<String, Platform> PLATFORMS = new HashMap<>();
-  private static final Map<String, Colorspace> COLORSPACES = new HashMap<>();
 
   static {
-    PLATFORMS.put("cc", new PlatformComputerCraft(false));
-    PLATFORMS.put("cc-paletted", new PlatformComputerCraft(true));
-    PLATFORMS.put("oc-tier1", new PlatformOpenComputers(PlatformOpenComputers.Screen.TIER_1));
-    PLATFORMS.put("oc-tier2", new PlatformOpenComputers(PlatformOpenComputers.Screen.TIER_2));
-    PLATFORMS.put("oc-tier3", new PlatformOpenComputers(PlatformOpenComputers.Screen.TIER_3));
-    PLATFORMS.put("zxspectrum", new PlatformZXSpectrum(0));
-    PLATFORMS.put("zxspectrum-dark", new PlatformZXSpectrum(1));
-
-    COLORSPACES.put("rgb", Colorspace.RGB);
-    COLORSPACES.put("yuv", Colorspace.YUV);
-    COLORSPACES.put("yiq", Colorspace.YIQ);
-
     DITHER_ARRAYS.put("floyd-steinberg", new float[]{
         0, 0, 0,
         0, 0, 7f / 16f,
@@ -216,8 +201,8 @@ public class Main {
   }
 
   public static Result convertImage(
-      final Platform platform,
-      final Colorspace colorspace,
+      final AbstractPlatform platform,
+      final AbstractColorspace colorspace,
       final int optimizationLevel,
       final boolean debug,
       final BufferedImage image,
@@ -412,30 +397,24 @@ public class Main {
       System.exit(0);
     }
 
-    Platform platform = PLATFORMS.get(params.mode.toLowerCase());
-    if (PLATFORM == null) {
-      System.err.printf("Invalid mode: %s%n", params.mode);
-      System.exit(1);
-    }
-
     if (params.files.size() == 0) {
-      System.err.println("No input file specified!");
+      System.err.println("You must specify an input file.");
       System.exit(1);
     }
 
-    final String imagePath = params.files.get(0);
-    BufferedImage image = Util.loadImage(imagePath);
-    if (image == null) {
-      System.err.printf("Could not load image: %s%n", imagePath);
+    String inputPath = params.files.get(0);
+    BufferedImage input = Util.loadImage(inputPath);
+    if (input == null) {
+      System.err.printf("Failed to read input image: %s%n", inputPath);
       System.exit(1);
     }
 
     Result result = convertImage(
-        platform,
-        COLORSPACES.get(params.colorspace.toLowerCase()),
+        params.mode.get(),
+        params.colorspace.get(),
         params.optimizationLevel,
         params.debug,
-        image,
+        input,
         params.w,
         params.h,
         params.ignoreAspectRatio,
@@ -450,11 +429,13 @@ public class Main {
         params.previewFilename
     );
 
-    String outputFilename = params.outputFilename != null ? params.outputFilename : params.files.get(0) + ".ctif";
+    String outputName = params.outputFilename != null ? params.outputFilename : params.files.get(0) + ".ctif";
     try {
-      Files.write(Path.of(outputFilename), result.data().toByteArray());
+      Files.write(Path.of(outputName), result.data().toByteArray());
     } catch (IOException e) {
+      System.err.printf("Failed to write output image: %s%n", outputName);
       e.printStackTrace();
+      System.exit(1);
     }
   }
 }

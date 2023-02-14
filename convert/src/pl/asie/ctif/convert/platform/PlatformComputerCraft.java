@@ -2,7 +2,7 @@ package pl.asie.ctif.convert.platform;
 
 import java.awt.Color;
 
-public class PlatformComputerCraft extends Platform {
+public class PlatformComputerCraft extends AbstractPlatform {
   public PlatformComputerCraft(boolean customPaletteAllowed) {
     super(2, 2, 3, 164, 81, customPaletteAllowed ? 16 : 0);
   }

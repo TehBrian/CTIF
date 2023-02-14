@@ -2,7 +2,7 @@ package pl.asie.ctif.convert.platform;
 
 import java.awt.Color;
 
-public class PlatformOpenComputers extends Platform {
+public class PlatformOpenComputers extends AbstractPlatform {
   public enum Screen {
     TIER_1,
     TIER_2,
@@ -44,12 +44,7 @@ public class PlatformOpenComputers extends Platform {
   }
 
   @Override
-  public float getDefaultAspectRatio() {
-    return (float) getWidth() / getRealHeight();
-  }
-
-  @Override
-  Color[] generatePalette() {
+  protected Color[] generatePalette() {
     Color[] colors = new Color[getColorCount()];
     if (screen == Screen.TIER_1) {
       colors[0] = new Color(0, 0, 0);

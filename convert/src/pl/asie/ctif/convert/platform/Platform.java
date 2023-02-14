@@ -1,70 +1,21 @@
 package pl.asie.ctif.convert.platform;
 
-import java.awt.Color;
+public enum Platform {
+  CC(new PlatformComputerCraft(false)),
+  CC_PALETTED(new PlatformComputerCraft(true)),
+  OC_TIER_1(new PlatformOpenComputers(PlatformOpenComputers.Screen.TIER_1)),
+  OC_TIER_2(new PlatformOpenComputers(PlatformOpenComputers.Screen.TIER_2)),
+  OC_TIER_3(new PlatformOpenComputers(PlatformOpenComputers.Screen.TIER_3)),
+  ZXSPECTRUM(new PlatformZXSpectrum(0)),
+  ZXSPECTRUM_DARK(new PlatformZXSpectrum(1));
 
-public abstract class Platform {
-  private final int platformId, charWidth, charHeight, width, height, customColorCount;
-  private Color[] palette = null;
+  final AbstractPlatform abstractPlatform;
 
-  protected Platform(int platformId, int charWidth, int charHeight, int width, int height, int customColorCount) {
-    this.platformId = platformId;
-    this.charWidth = charWidth;
-    this.charHeight = charHeight;
-    this.width = width;
-    this.height = height;
-    this.customColorCount = customColorCount;
+  Platform(AbstractPlatform abstractPlatform) {
+    this.abstractPlatform = abstractPlatform;
   }
 
-  public int getPlatformId() {
-    return platformId;
+  public AbstractPlatform get() {
+    return abstractPlatform;
   }
-
-  public int getCharWidth() {
-    return charWidth;
-  }
-
-  public int getCharHeight() {
-    return charHeight;
-  }
-
-  public int getWidth() {
-    return width;
-  }
-
-  public int getHeight() {
-    return height;
-  }
-
-  public int getChars() {
-    return getWidth() * getHeight();
-  }
-
-  public final int getWidthPx() {
-    return getWidth() * getCharWidth();
-  }
-
-  public final int getHeightPx() {
-    return getHeight() * getCharHeight();
-  }
-
-  public final int getCharsPx() {
-    return getChars() * getCharWidth() * getCharHeight();
-  }
-
-  public int getCustomColorCount() {
-    return customColorCount;
-  }
-
-  public float getDefaultAspectRatio() {
-    return (float) getWidth() / getHeight();
-  }
-
-  public Color[] getPalette() {
-    if (palette == null) {
-      palette = generatePalette();
-    }
-    return palette.clone();
-  }
-
-  abstract Color[] generatePalette();
 }

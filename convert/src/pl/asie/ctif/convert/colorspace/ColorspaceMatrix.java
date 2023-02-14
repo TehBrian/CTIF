@@ -1,6 +1,6 @@
 package pl.asie.ctif.convert.colorspace;
 
-public class ColorspaceMatrix extends Colorspace {
+public class ColorspaceMatrix extends AbstractColorspace {
   private final float[] matrixFromRGB;
   private final float[] matrixToRGB;
 
@@ -26,7 +26,7 @@ public class ColorspaceMatrix extends Colorspace {
     // @formatter:on
   }
 
-  protected final float[] mmul3(float[] a, float[] b) {
+  private float[] mmul3(float[] a, float[] b) {
     return new float[]{
         a[0] * b[0] + a[1] * b[1] + a[2] * b[2],
         a[0] * b[3] + a[1] * b[4] + a[2] * b[5],
