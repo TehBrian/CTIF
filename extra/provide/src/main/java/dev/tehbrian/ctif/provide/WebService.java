@@ -10,9 +10,9 @@ import io.javalin.http.HttpStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jspecify.annotations.Nullable;
-import pl.asie.ctif.convert.Converter;
-import pl.asie.ctif.convert.Main;
 import pl.asie.ctif.convert.colorspace.Colorspace;
+import pl.asie.ctif.convert.converter.Converter;
+import pl.asie.ctif.convert.converter.UglyConverter;
 import pl.asie.ctif.convert.platform.PlatformOpenComputers;
 
 import java.net.URI;
@@ -79,9 +79,9 @@ public final class WebService {
           .addArguments("-c", "png")
           .execute();
 
-      final Main.Result result = Main.convertImage(
+      final Converter.Result result = Converter.convertImage(
           new PlatformOpenComputers(PlatformOpenComputers.Screen.TIER_3),
-          Colorspace.YIQ,
+          Colorspace.YIQ.get(),
           1,
           false,
           grabber.take().getImage(),
@@ -95,7 +95,7 @@ public final class WebService {
           null,
           null,
           1.0F,
-          Converter.DitherMode.ERROR,
+          UglyConverter.DitherMode.ERROR,
           null
       );
 
