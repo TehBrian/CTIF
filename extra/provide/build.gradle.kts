@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "dev.tehbrian.ctif"
-version = "0.1.0"
+version = "0.2.0"
 
 java {
   toolchain.languageVersion.set(JavaLanguageVersion.of(17))
