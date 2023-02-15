@@ -60,18 +60,18 @@ function main()
   local current = 0
 
   while true do
-    local _, _, ascii, _, _ = event.pull("key_down")
-    if ascii == 63235 then
+    local _, _, _, code, _ = event.pull("key_down")
+    if code == 205 then
       -- right arrow key.
       current = next(current, #images)
       ctif.clearScreen()
       ctif.displayImage(src .. "/" .. images[current])
-    elseif ascii == 63234 then
+    elseif code == 203 then
       -- left arrow key.
       current = prev(current, #images)
       ctif.clearScreen()
       ctif.displayImage(src .. "/" .. images[current])
-    elseif ascii == 13 then
+    elseif code == 28 then
       -- enter.
       ctif.resetResolution()
       ctif.clearScreen()
