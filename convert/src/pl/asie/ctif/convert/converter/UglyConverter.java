@@ -25,7 +25,6 @@ public class UglyConverter {
   private final DitherMode ditherMode;
   private final float[] ditherMatrix;
   private final AbstractPlatform platform;
-  private final AbstractColorspace colorspace;
   private final int optimizationLevel;
 
   private final int ditherMatrixSize, ditherMatrixOffset, ditherMax;
@@ -47,7 +46,6 @@ public class UglyConverter {
     this.ditherMode = ditherMode;
     this.ditherMatrix = ditherMatrix;
     this.platform = platform;
-    this.colorspace = colorspace;
     this.optimizationLevel = optimizationLevel;
 
     if (ditherMode == DitherMode.ORDERED) {
@@ -70,11 +68,11 @@ public class UglyConverter {
     this.ch = image.getHeight() / ph;
 
     for (int i = 0; i < img.length; i++) {
-      img[i] = this.colorspace.fromRGB(image.getRGB(i % image.getWidth(), i / image.getWidth()));
+      img[i] = colorspace.fromRGB(image.getRGB(i % image.getWidth(), i / image.getWidth()));
     }
 
     for (int i = 0; i < palette.length; i++) {
-      pal[i] = this.colorspace.fromRGB(palette[i].getRGB());
+      pal[i] = colorspace.fromRGB(palette[i].getRGB());
     }
   }
 
