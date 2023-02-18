@@ -11,34 +11,26 @@ import java.io.FileOutputStream;
 import java.util.Arrays;
 
 public class Converter {
-  private static int rCeil(int x, int y) {
-    if (x % y > 0) {
-      return x - (x % y) + y;
-    } else {
-      return x;
-    }
-  }
-
   public record Result(BufferedImage image, ByteArrayOutputStream data) {
   }
 
   public static Result convertImage(
-      final AbstractPlatform platform,
-      final AbstractColorspace colorspace,
-      final int optimizationLevel,
       final boolean debug,
+      final AbstractPlatform platform,
+      final int optimizationLevel,
+      final AbstractColorspace colorspace,
+      final int threads,
       final BufferedImage image,
       int w,
       int h,
       final boolean ignoreAspectRatio,
-      final int threads,
       final Resizer.Mode resizeMode,
-      final String palette,
-      final int paletteSamplingResolution,
-      final String paletteExport,
+      UglyConverter.DitherMode ditherMode,
       String ditherType,
       final Float ditherLevel,
-      UglyConverter.DitherMode ditherMode
+      final int paletteSamplingResolution,
+      final String paletteExport,
+      final String palette
   ) {
     Color[] platformPalette = platform.getPalette();
 
@@ -199,6 +191,14 @@ public class Converter {
     } catch (Exception e) {
       e.printStackTrace();
       return new Result(null, null);
+    }
+  }
+
+  private static int rCeil(int x, int y) {
+    if (x % y > 0) {
+      return x - (x % y) + y;
+    } else {
+      return x;
     }
   }
 }

@@ -80,22 +80,21 @@ public final class WebService {
           .execute();
 
       final Converter.Result result = Converter.convertImage(
-          new PlatformOpenComputers(PlatformOpenComputers.Screen.TIER_3),
-          Colorspace.YIQ.get(),
-          1,
           false,
+          new PlatformOpenComputers(PlatformOpenComputers.Screen.TIER_3),
+          1,
+          Colorspace.YIQ.get(),
+          Runtime.getRuntime().availableProcessors(),
           grabber.take().getImage(),
           320,
           200,
           false,
-          Runtime.getRuntime().availableProcessors(),
           null,
-          null,
-          0,
-          null,
+          UglyConverter.DitherMode.ERROR,
           null,
           1.0F,
-          UglyConverter.DitherMode.ERROR,
+          0,
+          null,
           null
       );
 

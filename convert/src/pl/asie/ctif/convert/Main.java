@@ -119,22 +119,22 @@ public class Main {
     }
 
     Converter.Result result = Converter.convertImage(
-        params.mode.get(),
-        params.colorspace.get(),
-        params.optimizationLevel,
         params.debug,
+        params.mode.get(),
+        params.optimizationLevel,
+        params.colorspace.get(),
+        params.threads,
         input,
         params.w,
         params.h,
         params.ignoreAspectRatio,
-        params.threads,
         params.resizeMode,
-        params.palette,
-        params.paletteSamplingResolution,
-        params.paletteExport,
+        params.ditherMode,
         params.ditherType,
         params.ditherLevel,
-        params.ditherMode
+        params.paletteSamplingResolution,
+        params.paletteExport,
+        params.palette
     );
 
     String outputFilename = params.outputFilename != null ? params.outputFilename : params.inputFilename + ".ctif";
