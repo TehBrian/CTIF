@@ -117,8 +117,7 @@ public class Main {
         params.paletteExport,
         params.ditherType,
         params.ditherLevel,
-        params.ditherMode,
-        params.previewFilename
+        params.ditherMode
     );
 
     String outputName = params.outputFilename != null ? params.outputFilename : params.files.get(0) + ".ctif";
@@ -128,6 +127,15 @@ public class Main {
       System.err.printf("Failed to write output image: %s%n", outputName);
       e.printStackTrace();
       System.exit(1);
+    }
+
+    if (params.previewFilename != null) {
+      final File saveLocation = Path.of(params.previewFilename).toFile();
+      try {
+        ImageIO.write(result.image(), "png", saveLocation);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
     }
   }
 

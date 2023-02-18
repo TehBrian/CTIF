@@ -21,14 +21,6 @@ public class Converter {
     }
   }
 
-  private static void saveImage(BufferedImage image, String location) {
-    try {
-      ImageIO.write(image, "png", new File(location));
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
-
   public record Result(BufferedImage image, ByteArrayOutputStream data) {
   }
 
@@ -48,8 +40,7 @@ public class Converter {
       final String paletteExport,
       String ditherType,
       final Float ditherLevel,
-      UglyConverter.DitherMode ditherMode,
-      final String previewFilename
+      UglyConverter.DitherMode ditherMode
   ) {
     Color[] platformPalette = platform.getPalette();
 
@@ -204,10 +195,6 @@ public class Converter {
       time = System.currentTimeMillis() - time;
       if (debug) {
         System.out.println("Image conversion time: " + time + " ms");
-      }
-
-      if (previewFilename != null) {
-        saveImage(Resizer.speedyResize(outputImage, width * 2, height * 2), new File(previewFilename).getAbsolutePath());
       }
 
       return new Result(outputImage, outputData);
