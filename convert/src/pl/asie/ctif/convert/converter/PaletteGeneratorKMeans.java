@@ -55,14 +55,13 @@ public class PaletteGeneratorKMeans {
 
     Map<Integer, float[]> pointsAdded = new HashMap<>();
     if (samplingRes > 0) {
-      int maximum = samplingRes;
-      float stepX = (float) image.getWidth() / maximum;
-      float stepY = (float) image.getHeight() / maximum;
+      float stepX = (float) image.getWidth() / samplingRes;
+      float stepY = (float) image.getHeight() / samplingRes;
       int stepIX = (int) Math.ceil(stepX);
       int stepIY = (int) Math.ceil(stepY);
-      for (int jy = 0; jy < maximum; jy++) {
-        for (int jx = 0; jx < maximum * 2; jx++) {
-          int i = image.getRGB(random.nextInt(stepIX) + (int) ((jx % maximum) * stepX), random.nextInt(stepIY) + (int) (jy * stepY));
+      for (int jy = 0; jy < samplingRes; jy++) {
+        for (int jx = 0; jx < samplingRes * 2; jx++) {
+          int i = image.getRGB(random.nextInt(stepIX) + (int) ((jx % samplingRes) * stepX), random.nextInt(stepIY) + (int) (jy * stepY));
           if (!pointsAdded.containsKey(i)) {
             float[] key = this.colorspace.fromRGB(i);
             pointsAdded.put(i, key);
