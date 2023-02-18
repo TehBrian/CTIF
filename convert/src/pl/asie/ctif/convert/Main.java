@@ -2,7 +2,6 @@ package pl.asie.ctif.convert;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import org.jspecify.annotations.Nullable;
 import pl.asie.ctif.convert.colorspace.Colorspace;
 import pl.asie.ctif.convert.converter.Converter;
 import pl.asie.ctif.convert.converter.Resizer;
@@ -11,12 +10,9 @@ import pl.asie.ctif.convert.platform.Platform;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Main {
   @SuppressWarnings("FieldMayBeFinal")
@@ -63,14 +59,14 @@ public class Main {
     @Parameter(names = {"-N", "--no-aspect"}, description = "Ignore aspect ratio.")
     private boolean ignoreAspectRatio = false;
 
-    @Parameter(names = {"-o", "--output"}, description = "Output filename.")
+    @Parameter(names = {"-o", "--output"}, description = "Output image filename. The image will be in CTIF format.")
     private String outputFilename;
 
-    @Parameter(names = {"-P", "--preview"}, description = "Preview image filename.")
+    @Parameter(names = {"-P", "--preview"}, description = "Preview image filename. The image will be in PNG format.")
     private String previewFilename;
 
-    @Parameter(description = "Input file.")
-    private List<String> files = new ArrayList<>();
+    @Parameter(description = "Input image filename. The image must be in PNG format.")
+    private String inputFilename;
 
     @Parameter(names = {"-h", "--help"}, description = "Print usage.", help = true)
     private boolean help;
@@ -87,18 +83,33 @@ public class Main {
     if (params.help) {
       jCommander.usage();
       System.exit(0);
+      return;
     }
 
-    if (params.files.size() == 0) {
-      System.err.println("You must specify an input file.");
+    if (params.inputFilename == null) {
+      System.err.println("You must specify an input image.");
       System.exit(1);
+      return;
     }
 
-    String inputPath = params.files.get(0);
-    BufferedImage input = loadImage(inputPath);
+    BufferedImage input;
+    try {
+      if (params.inputFilename.equals("-")) {
+        input = ImageIO.read(System.in);
+      } else {
+        input = ImageIO.read(Path.of(params.inputFilename).toFile());
+      }
+    } catch (Exception e) {
+      System.err.printf("Failed to read input image: %s%n", params.inputFilename);
+      e.printStackTrace();
+      System.exit(1);
+      return;
+    }
+
     if (input == null) {
-      System.err.printf("Failed to read input image: %s%n", inputPath);
+      System.err.printf("Failed to read input image: %s%n", params.inputFilename);
       System.exit(1);
+      return;
     }
 
     Converter.Result result = Converter.convertImage(
@@ -120,35 +131,27 @@ public class Main {
         params.ditherMode
     );
 
-    String outputName = params.outputFilename != null ? params.outputFilename : params.files.get(0) + ".ctif";
+    String outputFilename = params.outputFilename != null ? params.outputFilename : params.inputFilename + ".ctif";
     try {
-      Files.write(Path.of(outputName), result.data().toByteArray());
+      Files.write(Path.of(outputFilename), result.data().toByteArray());
     } catch (IOException e) {
-      System.err.printf("Failed to write output image: %s%n", outputName);
+      System.err.printf("Failed to write output image: %s%n", outputFilename);
       e.printStackTrace();
       System.exit(1);
+      return;
     }
 
     if (params.previewFilename != null) {
-      final File saveLocation = Path.of(params.previewFilename).toFile();
       try {
-        ImageIO.write(result.image(), "png", saveLocation);
+        ImageIO.write(result.image(), "png", Path.of(params.previewFilename).toFile());
       } catch (IOException e) {
+        System.err.printf("Failed to write preview image: %s%n", params.previewFilename);
         e.printStackTrace();
+        System.exit(1);
+        return;
       }
     }
-  }
 
-  public static @Nullable BufferedImage loadImage(String location) {
-    try {
-      if (location.equals("-")) {
-        return ImageIO.read(System.in);
-      } else {
-        return ImageIO.read(new File(location));
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-      return null;
-    }
+    System.out.println("All done.");
   }
 }
