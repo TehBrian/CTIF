@@ -14,43 +14,35 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class PaletteGeneratorKMeans {
-  private static int[] getRGB(BufferedImage image) {
-    return image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
-  }
-
-  record Result(Color[] colors, double error) {
-  }
-
-  public class Worker implements Runnable {
-    public Result result;
-
-    @Override
-    public void run() {
-      result = generateKMeans();
-    }
-  }
-
+  private final BufferedImage image;
+  private final Color[] base;
+  private final int colors;
   private final AbstractColorspace colorspace;
   private final int optimizationLevel;
   private final boolean debug;
 
-  private final int colors;
-  private final BufferedImage image;
-  private final Color[] base;
   private final Random random = new Random();
-  private final Map<float[], Integer> pointsWeight = new HashMap<>();
   private final float[][] centroids;
+  private final Map<float[], Integer> pointsWeight = new HashMap<>();
   private final Map<float[], Double> knownBestError = new HashMap<>();
   private final Map<float[], Integer> knownBestCentroid = new HashMap<>();
 
-  public PaletteGeneratorKMeans(BufferedImage image, Color[] base, int colors, int samplingRes, AbstractColorspace colorspace, int optimizationLevel, boolean debug) {
+  public PaletteGeneratorKMeans(
+      BufferedImage image,
+      Color[] base,
+      int colors,
+      int samplingRes,
+      AbstractColorspace colorspace,
+      int optimizationLevel,
+      boolean debug
+  ) {
+    this.image = image;
+    this.base = base;
+    this.colors = colors;
     this.colorspace = colorspace;
     this.optimizationLevel = optimizationLevel;
     this.debug = debug;
 
-    this.colors = colors;
-    this.image = image;
-    this.base = base;
     this.centroids = new float[base.length][];
 
     Map<Integer, float[]> pointsAdded = new HashMap<>();
@@ -155,6 +147,18 @@ public class PaletteGeneratorKMeans {
     return bestResult.colors;
   }
 
+  public class Worker implements Runnable {
+    public Result result;
+
+    @Override
+    public void run() {
+      result = generateKMeans();
+    }
+  }
+
+  record Result(Color[] colors, double error) {
+  }
+
   private Result generateKMeans() {
     for (int i = 0; i < colors; i++) {
       centroids[i] = this.colorspace.fromRGB(image.getRGB(random.nextInt(image.getWidth()), random.nextInt(image.getHeight())));
@@ -212,5 +216,9 @@ public class PaletteGeneratorKMeans {
       out[k] = new Color(this.colorspace.toRGB(centroids[k]) | 0xFF000000);
     }
     return new Result(out, totalError);
+  }
+
+  private static int[] getRGB(BufferedImage image) {
+    return image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
   }
 }

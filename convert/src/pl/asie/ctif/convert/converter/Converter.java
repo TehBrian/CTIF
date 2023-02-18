@@ -3,11 +3,9 @@ package pl.asie.ctif.convert.converter;
 import pl.asie.ctif.convert.colorspace.AbstractColorspace;
 import pl.asie.ctif.convert.platform.AbstractPlatform;
 
-import javax.imageio.ImageIO;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Arrays;
