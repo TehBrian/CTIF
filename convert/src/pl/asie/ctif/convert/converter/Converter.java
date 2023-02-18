@@ -8,6 +8,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 
 public class Converter {
@@ -31,17 +32,8 @@ public class Converter {
       final int paletteSamplingResolution,
       final String paletteExport,
       final String palette
-  ) {
+  ) throws IOException {
     Color[] platformPalette = platform.getPalette();
-
-    // adjusting dither type.
-    if (ditherType == null) {
-      if (ditherMode == UglyConverter.DitherMode.ORDERED) {
-        ditherType = "4x4";
-      } else {
-        ditherType = "floyd-steinberg";
-      }
-    }
 
     // if width/height was set, max at platform char width/height.
     w = (w > 0) ? rCeil(w, platform.getCharWidth()) : 0;
@@ -74,9 +66,6 @@ public class Converter {
       System.exit(1);
     }
 
-    int width = w;
-    int height = h;
-
     if (debug) {
       System.out.println("Using " + threads + " threads.");
     }
@@ -85,12 +74,12 @@ public class Converter {
     long resizeTime = System.currentTimeMillis();
 
     BufferedImage resizedImage;
-    if (image.getWidth() == width && image.getHeight() == height) {
+    if (image.getWidth() == w && image.getHeight() == h) {
       resizedImage = image;
     } else if (resizeMode == Resizer.Mode.SPEED) {
-      resizedImage = Resizer.speedyResize(image, width, height);
+      resizedImage = Resizer.speedyResize(image, w, h);
     } else {
-      resizedImage = Resizer.qualityResize(image, width, height, resizeMode == Resizer.Mode.QUALITY_NATIVE);
+      resizedImage = Resizer.qualityResize(image, w, h, resizeMode == Resizer.Mode.QUALITY_NATIVE);
     }
 
     resizeTime = System.currentTimeMillis() - resizeTime;
@@ -140,6 +129,15 @@ public class Converter {
       }
     }
 
+    // default dither type.
+    if (ditherType == null) {
+      if (ditherMode == UglyConverter.DitherMode.ORDERED) {
+        ditherType = "4x4";
+      } else {
+        ditherType = "floyd-steinberg";
+      }
+    }
+
     float[] ditherArray = DitherArrays.get(ditherType.toLowerCase());
     if (ditherLevel == 0) {
       ditherMode = UglyConverter.DitherMode.NONE;
@@ -164,11 +162,13 @@ public class Converter {
       }
     }
 
+    ByteArrayOutputStream outputData = new ByteArrayOutputStream();
+    BufferedImage outputImage;
+
+    System.out.println("Converting image...");
+    final long startTime = System.currentTimeMillis();
+
     try {
-      System.out.println("Converting image...");
-
-      long time = System.currentTimeMillis();
-
       UglyConverter writer = new UglyConverter(
           resizedImage,
           platformPalette,
@@ -179,19 +179,18 @@ public class Converter {
           optimizationLevel
       );
 
-      ByteArrayOutputStream outputData = new ByteArrayOutputStream();
-      BufferedImage outputImage = writer.write(outputData);
-
-      time = System.currentTimeMillis() - time;
-      if (debug) {
-        System.out.println("Image conversion time: " + time + " ms");
-      }
-
-      return new Result(outputImage, outputData);
-    } catch (Exception e) {
+      outputImage = writer.write(outputData);
+    } catch (IOException e) {
       e.printStackTrace();
-      return new Result(null, null);
+      throw e;
     }
+
+    final long timeSpent = System.currentTimeMillis() - startTime;
+    if (debug) {
+      System.out.println("Image conversion time: " + timeSpent + " ms");
+    }
+
+    return new Result(outputImage, outputData);
   }
 
   private static int rCeil(int x, int y) {
