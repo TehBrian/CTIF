@@ -15,7 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class Main {
-  @SuppressWarnings("FieldMayBeFinal")
+  @SuppressWarnings({"FieldMayBeFinal", "unused"})
   private static class Parameters {
     /* meta. */
     @Parameter(names = {"-d", "--debug"}, description = "Enable debugging.", hidden = true)
