@@ -17,18 +17,14 @@ import java.nio.file.Path;
 public class Main {
   @SuppressWarnings("FieldMayBeFinal")
   private static class Parameters {
-    @Parameter(names = {"--palette-sampling-resolution"}, description = "The sampling resolution for palette generation. 0 means full image. (1/4x1/4 image in -O3+)")
-    private int paletteSamplingResolution = 0;
+    /* meta. */
+    @Parameter(names = {"-d", "--debug"}, description = "Enable debugging.", hidden = true)
+    private boolean debug = false;
 
-    @Parameter(names = {"--threads"}, description = "Amount of threads to create.")
-    private int threads = Runtime.getRuntime().availableProcessors();
+    @Parameter(names = {"-h", "--help"}, description = "Print usage.", help = true)
+    private boolean help;
 
-    @Parameter(names = {"--palette-export"}, description = "File to export the palette to.")
-    private String paletteExport;
-
-    @Parameter(names = {"--palette"}, description = "File to load the palette from.")
-    private String palette;
-
+    /* miscellaneous. */
     @Parameter(names = {"-m", "--mode"}, description = "Target platform.")
     private Platform mode = Platform.OC_TIER_3;
 
@@ -38,27 +34,10 @@ public class Main {
     @Parameter(names = {"--colorspace"}, description = "Image colorspace.")
     private Colorspace colorspace = Colorspace.YIQ;
 
-    @Parameter(names = {"--dither-mode"}, description = "Dither mode.")
-    private UglyConverter.DitherMode ditherMode = UglyConverter.DitherMode.ERROR;
+    @Parameter(names = {"--threads"}, description = "Amount of threads to create.")
+    private int threads = Runtime.getRuntime().availableProcessors();
 
-    @Parameter(names = {"--dither-type"}, description = "Dither type. (error: floyd-steinberg, sierra-lite; ordered: 2x2, 4x4, 8x8)")
-    private String ditherType;
-
-    @Parameter(names = {"--dither-level"}, description = "Dither level for error-type dither. 0 = off, 1 = full.")
-    private float ditherLevel = 1.0f;
-
-    @Parameter(names = {"-d", "--debug"}, description = "Enable debugging.", hidden = true)
-    private boolean debug = false;
-
-    @Parameter(names = {"-W", "--width"}, description = "Output image width.")
-    private int w;
-
-    @Parameter(names = {"-H", "--height"}, description = "Output image height.")
-    private int h;
-
-    @Parameter(names = {"-N", "--no-aspect"}, description = "Ignore aspect ratio.")
-    private boolean ignoreAspectRatio = false;
-
+    /* files. */
     @Parameter(names = {"-o", "--output"}, description = "Output image filename. The image will be in CTIF format.")
     private String outputFilename;
 
@@ -68,11 +47,38 @@ public class Main {
     @Parameter(description = "Input image filename. The image must be in PNG format.")
     private String inputFilename;
 
-    @Parameter(names = {"-h", "--help"}, description = "Print usage.", help = true)
-    private boolean help;
+    /* sizing. */
+    @Parameter(names = {"-W", "--width"}, description = "Output image width.")
+    private int w;
+
+    @Parameter(names = {"-H", "--height"}, description = "Output image height.")
+    private int h;
+
+    @Parameter(names = {"-N", "--no-aspect"}, description = "Ignore aspect ratio.")
+    private boolean ignoreAspectRatio = false;
 
     @Parameter(names = {"--resize-mode"}, description = "Resize mode.")
     private Resizer.Mode resizeMode;
+
+    /* dither. */
+    @Parameter(names = {"--dither-mode"}, description = "Dither mode.")
+    private UglyConverter.DitherMode ditherMode = UglyConverter.DitherMode.ERROR;
+
+    @Parameter(names = {"--dither-type"}, description = "Dither type. (error: floyd-steinberg, sierra-lite; ordered: 2x2, 4x4, 8x8)")
+    private String ditherType;
+
+    @Parameter(names = {"--dither-level"}, description = "Dither level for error-type dither. 0 = off, 1 = full.")
+    private float ditherLevel = 1.0f;
+
+    /* palette. */
+    @Parameter(names = {"--palette-sampling-resolution"}, description = "The sampling resolution for palette generation. 0 means full image. (1/4x1/4 image in -O3+)")
+    private int paletteSamplingResolution = 0;
+
+    @Parameter(names = {"--palette-export"}, description = "File to export the palette to.")
+    private String paletteExport;
+
+    @Parameter(names = {"--palette"}, description = "File to load the palette from.")
+    private String palette;
   }
 
   public static void main(String[] args) {
