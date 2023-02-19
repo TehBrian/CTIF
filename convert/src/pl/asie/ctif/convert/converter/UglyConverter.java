@@ -131,7 +131,7 @@ public class UglyConverter {
     }
   }
 
-  private void writePixelData(OutputStream stream, BufferedImage output) throws IOException {
+  private void writePixelData(final OutputStream stream, final BufferedImage output) throws IOException {
     int ew = (pw + ditherMatrixOffset * 2);
     int eh = (ph + ditherMatrixOffset * 2);
 
