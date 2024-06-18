@@ -7,7 +7,7 @@ group = "dev.tehbrian.ctif"
 version = "0.2.0"
 
 java {
-  toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+  toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 }
 
 application {
