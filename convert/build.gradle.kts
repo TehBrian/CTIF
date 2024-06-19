@@ -1,7 +1,8 @@
 plugins {
   id("java-library")
   id("maven-publish")
-  id("com.github.johnrengelman.shadow") version "7.0.0"
+  id("com.github.johnrengelman.shadow") version "8.1.1"
+  id("com.github.ben-manes.versions") version "0.51.0"
 }
 
 group = "pl.asie.ctif"
