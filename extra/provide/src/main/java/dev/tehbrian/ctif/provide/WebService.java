@@ -10,6 +10,7 @@ import io.javalin.http.HttpStatus;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jspecify.annotations.Nullable;
+import pl.asie.ctif.convert.Stopwatch;
 import pl.asie.ctif.convert.colorspace.Colorspace;
 import pl.asie.ctif.convert.converter.Converter;
 import pl.asie.ctif.convert.converter.UglyConverter;
@@ -21,6 +22,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 
 /**
  * Controls the web server.
@@ -53,6 +55,11 @@ public final class WebService {
     }
   }
 
+  public String elapsed(final Stopwatch stopwatch) {
+    final Duration elapsed = stopwatch.timeElapsed();
+    return String.format("%s.%s", elapsed.toSeconds(), elapsed.toMillisPart());
+  }
+
   public void convert(final Context ctx) {
     final var url = ctx.queryParam("url");
     if (url == null || url.isEmpty()) {
@@ -81,6 +88,8 @@ public final class WebService {
     }
     LOGGER.info("|  User Agent: `{}`", ctx.userAgent());
 
+    LOGGER.info("Requesting source from URL.");
+    final var toSource = Stopwatch.started();
     final InputStream source;
     final HttpClient client = HttpClient.newHttpClient();
     try {
@@ -94,7 +103,10 @@ public final class WebService {
       ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
       return;
     }
+    LOGGER.info("Requested source from URL. Took {}.", elapsed(toSource));
 
+    LOGGER.info("Converting source to frame with FFmpeg.");
+    final var toFrame = Stopwatch.started();
     final var grabber = new ImageGrabber();
     FFmpeg.atPath()
         .addInput(PipeInput.pumpFrom(source))
@@ -102,9 +114,12 @@ public final class WebService {
         .addArguments("-f", "image2")
         .addArguments("-c", "png")
         .execute();
+    LOGGER.info("Converted source to frame. Took {}.", elapsed(toFrame));
 
     client.close();
 
+    LOGGER.info("Converting frame to CTIF.");
+    final var toCtif = Stopwatch.started();
     final Converter.Result result = Converter.convertImage(
         false,
         new PlatformOpenComputers(PlatformOpenComputers.Screen.TIER_3),
@@ -123,6 +138,7 @@ public final class WebService {
         null,
         null
     );
+    LOGGER.info("Converted frame to CTIF. Took {}.", elapsed(toCtif));
 
     ctx.header("Content-Disposition", "inline");
     ctx.contentType(ContentType.APPLICATION_OCTET_STREAM);
