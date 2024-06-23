@@ -111,8 +111,6 @@ public final class WebService {
     FFmpeg.atPath()
         .addInput(PipeInput.pumpFrom(source))
         .addOutput(FrameOutput.withConsumer(grabber))
-        .addArguments("-f", "image2")
-        .addArguments("-c", "png")
         .execute();
     LOGGER.info("Converted source to frame. Took {}.", elapsed(toFrame));
 
