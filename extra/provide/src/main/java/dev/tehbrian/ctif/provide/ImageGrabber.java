@@ -22,9 +22,6 @@ public class ImageGrabber implements FrameConsumer {
   }
 
   public Frame take() {
-    if (frames.size() != 1) {
-      System.err.println("Image grabber expects only one frame. Bad! >:(");
-    }
-    return frames.get(0);
+    return frames.getFirst();
   }
 }
