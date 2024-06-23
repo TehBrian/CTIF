@@ -15,6 +15,8 @@ import pl.asie.ctif.convert.converter.Converter;
 import pl.asie.ctif.convert.converter.UglyConverter;
 import pl.asie.ctif.convert.platform.PlatformOpenComputers;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -29,7 +31,7 @@ public final class WebService {
   private @Nullable Javalin javalin;
 
   /**
-   * Starts the web server and sets up the appropriate endpoints.
+   * Starts the web server. Creates the conversion endpoint.
    */
   public void start() {
     this.javalin = Javalin.create();
@@ -79,10 +81,19 @@ public final class WebService {
     }
     LOGGER.info("|  User Agent: `{}`", ctx.userAgent());
 
-    final var source = HttpClient.newHttpClient().send(
-        HttpRequest.newBuilder(uri).build(),
-        HttpResponse.BodyHandlers.ofInputStream()
-    ).body();
+    final InputStream source;
+    final HttpClient client = HttpClient.newHttpClient();
+    try {
+      source = client.send(
+          HttpRequest.newBuilder(uri).build(),
+          HttpResponse.BodyHandlers.ofInputStream()
+      ).body();
+    } catch (final IOException | InterruptedException e) {
+      LOGGER.info("Exception caught while requesting source.", e);
+      ctx.result("Error while requesting source.");
+      ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
+      return;
+    }
 
     final var grabber = new ImageGrabber();
     FFmpeg.atPath()
@@ -91,6 +102,8 @@ public final class WebService {
         .addArguments("-f", "image2")
         .addArguments("-c", "png")
         .execute();
+
+    client.close();
 
     final Converter.Result result = Converter.convertImage(
         false,
