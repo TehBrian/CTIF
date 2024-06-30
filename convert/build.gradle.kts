@@ -19,7 +19,7 @@ dependencies {
 }
 
 java {
-  toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+  toolchain.languageVersion.set(JavaLanguageVersion.of(22))
 
   sourceSets["main"].java {
     srcDir("src")
